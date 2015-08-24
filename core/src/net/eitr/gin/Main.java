@@ -11,7 +11,7 @@ public class Main implements ApplicationListener {
 	OrthographicCamera camera;
 	Viewport view;
 	WorldManager world;
-	Stage gui; //TODO
+	DebugInterface gui;
 	InputHandler input;
 	
 	final int viewSize = 8;
@@ -25,7 +25,7 @@ public class Main implements ApplicationListener {
 		camera.update();
 
 		world = new WorldManager();
-		gui = new Stage(view);
+		gui = new DebugInterface(view);
 		input = new InputHandler(world,camera);
 		
 		InputMultiplexor im = new InputMultiplexor();
@@ -35,15 +35,14 @@ public class Main implements ApplicationListener {
 	}
 
 	@Override
-	public void render (float delta) {
+	public void render () {
 		input.handleInput(player,camera);
 		camera.update();
 
 		Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		gui.act(delta);
-		gui.draw();
+		gui.update();
 		world.draw(camera);
 		world.simulate();
 	}
