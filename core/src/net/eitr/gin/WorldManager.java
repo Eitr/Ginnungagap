@@ -26,7 +26,8 @@ public class WorldManager {
 
 	World world;
 
-	Array<Ship> players;
+	//Array<Ship> players;
+	Ship player;
 	Array<Rock> rocks;
 
 	private float frameTotalTime = 0;
@@ -35,6 +36,7 @@ public class WorldManager {
 	SpriteBatch sprites;
 	PolygonSpriteBatch polygons;
 	ShapeRenderer shapes;
+	BitmapFont font;
 
 	Box2DDebugRenderer debugRenderer;
 
@@ -47,7 +49,8 @@ public class WorldManager {
 		BodyDef shipDef = new BodyDef();
 		shipDef.type = BodyType.DynamicBody;
 		shipDef.position.set(0,0);
-		players.add(new Ship(world.createBody(shipDef)));
+		//players.add(new Ship(world.createBody(shipDef)));
+		player = new Ship(world.createBody(shipDef));
 
 		BodyDef rockDef = new BodyDef();
 		rockDef.type = BodyType.StaticBody;
@@ -81,13 +84,18 @@ public class WorldManager {
 		polygons = new PolygonSpriteBatch();
 		shapes = new ShapeRenderer();
 		debugRenderer = new Box2DDebugRenderer();
+		font = new BitmapFont();
 	}
 
-	public void doRender (OrthographicCamera cam) {
+	public void draw (OrthographicCamera cam) {
 		sprites.setProjectionMatrix(cam.combined);
 		shapes.setProjectionMatrix(cam.combined);
 		polygons.setProjectionMatrix(cam.combined);
-
+		
+		sprites.begin();
+		font.draw(sprites,(int)(1/Gdx.graphics.getDeltaTime())+" FPS",100,100);
+		sprites.end();
+		
 		polygons.begin();
 		for(Rock rock : rocks) {
 			rock.draw(polygons);
@@ -95,65 +103,23 @@ public class WorldManager {
 		polygons.end();
 
 		shapes.begin(ShapeType.Filled);
-		for(Ship ship : players) {
-			ship.draw(shapes);
-		}
+		//for(Ship ship : players) {
+		//	ship.draw(shapes);
+		//}
+		player.draw(shapes);
 		shapes.end();
 
 		debugRenderer.setDrawVelocities(true);
 		debugRenderer.render(world, cam.combined);
 	}
 
-	public void doPhysics () {
+	public void simulate () {
 		world.step(1/300f, 6, 2);
 		frameTotalTime += Gdx.graphics.getDeltaTime();
 		while (frameTotalTime >= TIME_STEP) {
 			world.step(TIME_STEP,6,2);
 			frameTotalTime -= TIME_STEP;
 		}
-	}
-
-	public void doInput (OrthographicCamera cam) {
-		for(Ship ship : players) {
-			handleInput(ship, cam);
-		}
-	}
-
-	private void handleInput (Ship ship, OrthographicCamera cam) {
-		if (Gdx.input.isKeyPressed(Input.Keys.EQUALS)) {
-			cam.zoom -= 0.02;
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.MINUS)) {
-			cam.zoom += 0.02;
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-			ship.rotateLeft();
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-			ship.rotateRight();
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-			ship.thrust();
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.R)) {
-			ship.reset();
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.P)) {
-			System.out.println("Pos: "+ship.getPosition());
-		}
-
-		cam.position.set(ship.getX(), ship.getY(), 0);
-
-		// Sets min/max for zoom
-		cam.zoom = MathUtils.clamp(cam.zoom, 0.5f, 3f);
-
-		// Keep the camera inside the boundaries of the map
-		float effectiveViewportWidth = cam.viewportWidth * cam.zoom;
-		float effectiveViewportHeight = cam.viewportHeight * cam.zoom;
-		cam.position.x = MathUtils.clamp(cam.position.x, effectiveViewportWidth / 2f - WORLD_WIDTH/2F, WORLD_WIDTH/2f - effectiveViewportWidth / 2f);
-		cam.position.y = MathUtils.clamp(cam.position.y, effectiveViewportHeight / 2f - WORLD_HEIGHT/2F, WORLD_HEIGHT/2f - effectiveViewportHeight / 2f);
 	}
 
 	public void dispose() {
