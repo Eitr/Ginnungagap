@@ -1,4 +1,4 @@
-package net.eitr.gin;
+package net.eitr.gin.example;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.audio.Music;

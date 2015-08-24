@@ -16,6 +16,6 @@ public class DesktopLauncher {
 		config.height = 900;
 //		config.title = Main.version;
 		
-		new LwjglApplication(new Drop(), config);
+		new LwjglApplication(new Main(), config);
 	}
 }
