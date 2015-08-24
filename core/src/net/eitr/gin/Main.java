@@ -8,37 +8,49 @@ import com.badlogic.gdx.utils.viewport.*;
 
 public class Main implements ApplicationListener {
 
-
-	OrthographicCamera cam;
-	Viewport vp;
+	OrthographicCamera camera;
+	Viewport view;
 	WorldManager world;
+	Stage gui; //TODO
+	InputHandler input;
+	
+	final int viewSize = 8;
 
 	@Override
 	public void create() {
-		vp = new FitViewport(128, 72);
-		cam = new OrthographicCamera(vp.getWorldWidth(), vp.getWorldHeight());
+		view = new FitViewport(vieSize*16, viewSize*9); // 16:9 aspect ratio
+		camera = new OrthographicCamera(vp.getWorldWidth(), vp.getWorldHeight());
 		vp.setCamera(cam);
-		cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
-		cam.update();
+		camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0);
+		camera.update();
 
 		world = new WorldManager();
+		gui = new Stage(view);
+		input = new InputHandler(world,camera);
+		
+		InputMultiplexor im = new InputMultiplexor();
+		im.add(gui);
+		im.add(input);
+		Gdx.input.setInputProcessor(im);
 	}
 
 	@Override
-	public void render () {
-		world.doInput(cam);
-		cam.update();
+	public void render (float delta) {
+		input.handleInput(player,camera);
+		camera.update();
 
 		Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		world.doRender(cam);
-		world.doPhysics();
+		gui.act(delta);
+		gui.draw();
+		world.draw(camera);
+		world.simulate();
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		vp.update(width, height);
+		view.update(width, height);
 	}
 
 	@Override
@@ -48,6 +60,7 @@ public class Main implements ApplicationListener {
 	@Override
 	public void dispose() {
 		world.dispose();
+		gui.dispose();
 	}
 
 	@Override
