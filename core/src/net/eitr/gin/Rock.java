@@ -55,7 +55,7 @@ public class Rock {
 		vertices[i++] = s;
 		vertices[i++] = MathUtils.random(0,s/2);
 		vertices[i++] = s;
-		vertices[i++] = MathUtils.random(0,s/2);
+		vertices[i++] = MathUtils.random(s/2,s);
 		vertices[i++] = MathUtils.random(s/2,s);
 		vertices[i++] = s;
 		vertices[i++] = MathUtils.random(0,s/2);
