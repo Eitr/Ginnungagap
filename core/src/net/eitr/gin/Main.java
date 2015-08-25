@@ -2,6 +2,7 @@ package net.eitr.gin;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.utils.viewport.*;
@@ -9,47 +10,48 @@ import com.badlogic.gdx.utils.viewport.*;
 public class Main implements ApplicationListener {
 
 	OrthographicCamera camera;
-	Viewport view;
+	Viewport gameView, guiView;
 	WorldManager world;
-	DebugInterface gui;
+	static DebugInterface gui;
 	InputHandler input;
 	
 	final int viewSize = 8;
 
 	@Override
 	public void create() {
-		view = new FitViewport(vieSize*16, viewSize*9); // 16:9 aspect ratio
-		camera = new OrthographicCamera(vp.getWorldWidth(), vp.getWorldHeight());
-		vp.setCamera(cam);
+		gameView = new FitViewport(viewSize*16, viewSize*9); // 16:9 aspect ratio
+		guiView = new FitViewport(1600,900);
+		camera = new OrthographicCamera(gameView.getWorldWidth(), gameView.getWorldHeight());
+		gameView.setCamera(camera);
 		camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0);
 		camera.update();
 
+		gui = new DebugInterface(guiView);
 		world = new WorldManager();
-		gui = new DebugInterface(view);
 		input = new InputHandler(world,camera);
 		
-		InputMultiplexor im = new InputMultiplexor();
-		im.add(gui);
-		im.add(input);
+		InputMultiplexer im = new InputMultiplexer();
+		im.addProcessor(gui);
+		im.addProcessor(input);
 		Gdx.input.setInputProcessor(im);
 	}
 
 	@Override
 	public void render () {
-		input.handleInput(player,camera);
+		input.handleInput(world.getPlayer(),camera);
 		camera.update();
 
 		Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		gui.update();
+		gui.update(world);
 		world.draw(camera);
 		world.simulate();
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		view.update(width, height);
+		gameView.update(width, height);
 	}
 
 	@Override

@@ -1,90 +1,78 @@
 package net.eitr.gin;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.EdgeShape;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Array;
 
 public class WorldManager {
-
-	static final int WORLD_WIDTH = 1000;
-	static final int WORLD_HEIGHT = 1000;
+	
+	static DebugInterface gui = Main.gui;
 
 	World world;
 
 	//Array<Ship> players;
-	Ship player;
+	Ship ship;
 	Array<Rock> rocks;
+	Body builder;
+	boolean building = false;
 
-	private float frameTotalTime = 0;
-	final float TIME_STEP = 1/300f;
+	float frameTotalTime = 0;
 
 	SpriteBatch sprites;
 	PolygonSpriteBatch polygons;
 	ShapeRenderer shapes;
-	BitmapFont font;
 
 	Box2DDebugRenderer debugRenderer;
+	Vector2 mousePos;
 
 	public WorldManager () {
-		world = new World(new Vector2(0,0), true);
-
-		players = new Array<Ship>();
-		rocks = new Array<Rock>();
-
-		BodyDef shipDef = new BodyDef();
-		shipDef.type = BodyType.DynamicBody;
-		shipDef.position.set(0,0);
-		//players.add(new Ship(world.createBody(shipDef)));
-		player = new Ship(world.createBody(shipDef));
-
-		BodyDef rockDef = new BodyDef();
-		rockDef.type = BodyType.StaticBody;
-		for (int i = 0; i < WORLD_WIDTH*WORLD_HEIGHT/10000; i++) {
-			rockDef.position.set(MathUtils.random(-WORLD_WIDTH/2f,WORLD_WIDTH/2f),MathUtils.random(-WORLD_HEIGHT/2f,WORLD_HEIGHT/2f));
-			rocks.add(new Rock(world.createBody(rockDef)));
-		}
+		init();
+		createPlayers();
+		createRocks();
+		createWorldEdges();
 		
-		BodyDef edgeDef = new BodyDef();
-		edgeDef.type = BodyType.StaticBody;
-		edgeDef.position.set(0, 0);
-		Body edge = world.createBody(edgeDef);
-		// Create the fixture definition for this body
-		EdgeShape edgeShape = new EdgeShape();
+		BodyDef builderDef = new BodyDef();
+		builderDef.type = BodyType.StaticBody;
+		builderDef.position.set(100, 100);
+		builder = world.createBody(builderDef);
+		
+		CircleShape circle = new CircleShape();
 		FixtureDef fDef = new FixtureDef();
-		edgeShape.set(-WORLD_WIDTH/2,-WORLD_HEIGHT/2,WORLD_WIDTH/2,-WORLD_HEIGHT/2);
-		fDef.shape = edgeShape;
-		edge.createFixture(fDef);
-		edgeShape.set(WORLD_WIDTH/2,-WORLD_HEIGHT/2,WORLD_WIDTH/2,WORLD_HEIGHT/2);
-		fDef.shape = edgeShape;
-		edge.createFixture(fDef);
-		edgeShape.set(WORLD_WIDTH/2,WORLD_HEIGHT/2,-WORLD_WIDTH/2,WORLD_HEIGHT/2);
-		fDef.shape = edgeShape;
-		edge.createFixture(fDef);
-		edgeShape.set(-WORLD_WIDTH/2,WORLD_HEIGHT/2,-WORLD_WIDTH/2,-WORLD_HEIGHT/2);
-		fDef.shape = edgeShape;
-		edge.createFixture(fDef);
-		edgeShape.dispose();
+		circle.setRadius(4);
+		fDef.shape = circle;
+		fDef.isSensor = true;
+		builder.createFixture(fDef);
+		builder.setUserData(circle);
+//		circle.dispose();
+		
+		world.setContactListener(new ContactListener() {
+			@Override
+			public void beginContact(Contact contact) {
+				if (contact.getFixtureA().getBody() == ship.body || contact.getFixtureB().getBody() == ship.body){
+					building = true;
+					gui.debug("build", building+"");
+				}
+			}
 
-		sprites = new SpriteBatch();
-		polygons = new PolygonSpriteBatch();
-		shapes = new ShapeRenderer();
-		debugRenderer = new Box2DDebugRenderer();
-		font = new BitmapFont();
+			@Override
+			public void endContact(Contact contact) {
+				building = false;
+				gui.debug("build", building+"");
+			}
+
+			@Override
+			public void preSolve(Contact contact, Manifold oldManifold) {}
+
+			@Override
+			public void postSolve(Contact contact, ContactImpulse impulse) {}
+		});
 	}
 
 	public void draw (OrthographicCamera cam) {
@@ -92,9 +80,8 @@ public class WorldManager {
 		shapes.setProjectionMatrix(cam.combined);
 		polygons.setProjectionMatrix(cam.combined);
 		
-		sprites.begin();
-		font.draw(sprites,(int)(1/Gdx.graphics.getDeltaTime())+" FPS",100,100);
-		sprites.end();
+//		sprites.begin();
+//		sprites.end();
 		
 		polygons.begin();
 		for(Rock rock : rocks) {
@@ -106,7 +93,9 @@ public class WorldManager {
 		//for(Ship ship : players) {
 		//	ship.draw(shapes);
 		//}
-		player.draw(shapes);
+		ship.draw(shapes);
+		shapes.circle(builder.getPosition().x, builder.getPosition().y, 4);
+		gui.debug("builder",(int)builder.getPosition().x+","+(int)builder.getPosition().y);
 		shapes.end();
 
 		debugRenderer.setDrawVelocities(true);
@@ -116,12 +105,84 @@ public class WorldManager {
 	public void simulate () {
 		world.step(1/300f, 6, 2);
 		frameTotalTime += Gdx.graphics.getDeltaTime();
-		while (frameTotalTime >= TIME_STEP) {
-			world.step(TIME_STEP,6,2);
-			frameTotalTime -= TIME_STEP;
+		while (frameTotalTime >= Units.TIME_STEP) {
+			world.step(Units.TIME_STEP,6,2);
+			frameTotalTime -= Units.TIME_STEP;
+		}
+		
+		builder.setTransform(mousePos, builder.getAngle());
+		gui.debug("mouse","("+(int)mousePos.x+","+(int)mousePos.y+")");
+	}
+	
+	public void buildShip () {
+		if (building) {
+			ship.body.createFixture((Shape)builder.getUserData(),0.5f);
+			System.out.println("fuck off");
 		}
 	}
 
+	public Ship getPlayer () {
+		return ship;
+	}
+	
+	public void setMousePosition (Vector3 m) {
+		mousePos.x = m.x;
+		mousePos.y = m.y;
+	}
+	
+	private void createPlayers () {
+//		players = new Array<Ship>();
+		BodyDef shipDef = new BodyDef();
+		shipDef.type = BodyType.DynamicBody;
+		shipDef.position.set(0,0);
+		//players.add(new Ship(world.createBody(shipDef)));
+		ship = new Ship(world.createBody(shipDef));
+	}
+	
+	private void createRocks () {
+		rocks = new Array<Rock>();
+		BodyDef rockDef = new BodyDef();
+		rockDef.type = BodyType.DynamicBody;
+		for (int i = 0; i < Units.WORLD_WIDTH*Units.WORLD_HEIGHT/10000; i++) {
+			rockDef.position.set(MathUtils.random(-Units.WORLD_WIDTH/2f,Units.WORLD_WIDTH/2f),MathUtils.random(-Units.WORLD_HEIGHT/2f,Units.WORLD_HEIGHT/2f));
+			rocks.add(new Rock(world.createBody(rockDef)));
+		}
+	}
+	
+	private void init () {
+		world = new World(new Vector2(0,0), true);
+		sprites = new SpriteBatch();
+		polygons = new PolygonSpriteBatch();
+		shapes = new ShapeRenderer();
+		debugRenderer = new Box2DDebugRenderer();
+		mousePos = new Vector2();
+	}
+	
+	private void createWorldEdges () {
+		BodyDef edgeDef = new BodyDef();
+		edgeDef.type = BodyType.StaticBody;
+		edgeDef.position.set(0, 0);
+		Body edge = world.createBody(edgeDef);
+		// Create the fixture definition for this body
+		EdgeShape edgeShape = new EdgeShape();
+		FixtureDef fDef = new FixtureDef();
+		int w = Units.WORLD_WIDTH/2;
+		int h = Units.WORLD_HEIGHT/2;
+		edgeShape.set(-w,-h,w,-h);
+		fDef.shape = edgeShape;
+		edge.createFixture(fDef);
+		edgeShape.set(w,-h,w,h);
+		fDef.shape = edgeShape;
+		edge.createFixture(fDef);
+		edgeShape.set(w,h,-w,h);
+		fDef.shape = edgeShape;
+		edge.createFixture(fDef);
+		edgeShape.set(-w,h,-w,-h);
+		fDef.shape = edgeShape;
+		edge.createFixture(fDef);
+		edgeShape.dispose();
+	}
+	
 	public void dispose() {
 		sprites.dispose();
 		shapes.dispose();

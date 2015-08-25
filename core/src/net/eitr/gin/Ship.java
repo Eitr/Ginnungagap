@@ -4,12 +4,14 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Array;
 
 public class Ship {
 
-	private float width, height, thrust, rotationSpeed;
-	private boolean thrusting;
-	private Body body;
+	float width, height, thrust, rotationSpeed;
+	boolean thrusting;
+	Body body;
+	Array<ShipPart> parts;
     
     public Ship (Body b) {
     	body = b;
@@ -18,6 +20,7 @@ public class Ship {
     	thrust = 20f;
     	rotationSpeed = 3.0f;
     	thrusting = false;
+    	parts = new Array<ShipPart>();
     	
     	// Create the fixture definition for this body
     	PolygonShape shape = new PolygonShape();
@@ -31,12 +34,12 @@ public class Ship {
     	shape.dispose();
     	body.setAngularDamping(rotationSpeed*10);
 
-    	CircleShape circleShape = new CircleShape();
-    	circleShape.setRadius(width);
-    	circleShape.setPosition(new Vector2(height/2,0));
-    	Fixture circleFixture = body.createFixture(shape, 1f);
-    	circleShape.dispose();
-    	circleFixture.setUserData(""); //TODO set id and shape of body part
+//    	CircleShape circleShape = new CircleShape();
+//    	circleShape.setRadius(width);
+//    	circleShape.setPosition(new Vector2(height/2,0));
+//    	Fixture circleFixture = body.createFixture(shape, 1f);
+//    	circleShape.dispose();
+//    	circleFixture.setUserData(""); //TODO set id and shape of body part
     }
     
     public void rotateLeft () {
@@ -50,22 +53,29 @@ public class Ship {
     public void thrust () {
     	float xforce = (float)(Math.cos(body.getAngle())*thrust);
     	float yforce = (float)(Math.sin(body.getAngle())*thrust);
-
 //    	body.applyForceToCenter(xforce,yforce,true);
     	body.applyLinearImpulse(xforce, yforce, body.getPosition().x, body.getPosition().y, true);
     	thrusting = true;
     }
     
-    public void reset () {
+    /** Used for checking collision */
+    public void glide () {
+    	body.setLinearVelocity(0, 0);
+    	body.applyLinearImpulse(1f, 0f, body.getPosition().x, body.getPosition().y, true);
+    }
+    
+    public void resetPosition () {
     	body.setTransform(0, 0, 0);
     	body.setLinearVelocity(0, 0);
     }
     
     public void draw (ShapeRenderer g) {
     	g.identity();
+    	//TODO: translate vs set position
         g.translate(body.getPosition().x, body.getPosition().y, 0);
         g.rotate(0, 0, 1, (float)(body.getAngle()/Math.PI*180f-90));
         g.setColor(1, 1, 0, 1);
+//        g.rect(x, y, width, height);
         g.rect(-width/2,-height/2,width,height);
         if (thrusting) {
 	        g.setColor(1, 0, 0, 1);
@@ -74,8 +84,8 @@ public class Ship {
 	        g.rect(MathUtils.random(-width/2,width/2),-MathUtils.random(0,height/2)-height/2,0.5f,0.5f);
 	        thrusting = false;
         }
-        for (Fixture f : body.getFixtureList()) {
-        	f.getUserData().draw();
+        for (ShipPart p : parts) {
+        	p.draw(g);
         }
         g.rotate(0, 0, 1, -(float)(body.getAngle()/Math.PI*180f-90));
         g.translate(-body.getPosition().x, -body.getPosition().y, 0);
