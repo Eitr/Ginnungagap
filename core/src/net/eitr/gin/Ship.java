@@ -12,6 +12,7 @@ public class Ship {
 	boolean thrusting;
 	Body body;
 	Array<ShipPart> parts;
+	Sprite sprite;
     
     public Ship (Body b) {
     	body = b;
@@ -33,6 +34,12 @@ public class Ship {
     	body.createFixture(fDef);
     	shape.dispose();
     	body.setAngularDamping(rotationSpeed*10);
+    	
+		Pixmap pix = new Pixmap(1, 1, Pixmap.Format.RGB888);
+		pix.setColor(0.8f, 0.0f, 0.8f, 1);
+		pix.fill();
+    	sprite = new Sprite(new Texture(pix));
+    	sprite.setBounds(-height/2,-width/2,height,width);
 
 //    	CircleShape circleShape = new CircleShape();
 //    	circleShape.setRadius(width);
@@ -68,6 +75,13 @@ public class Ship {
     	body.setTransform(0, 0, 0);
     	body.setLinearVelocity(0, 0);
     }
+    
+    
+	public void draw (SpriteBatch g) {
+		sprite.setRotation(body.getAngle()*180f/MathUtils.PI);
+		sprite.setPosition(body.getPosition().x, body.getPosition().y);
+		sprite.draw(g);
+	}
     
     public void draw (ShapeRenderer g) {
     	g.identity();
