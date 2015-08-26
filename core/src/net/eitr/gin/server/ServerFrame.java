@@ -100,6 +100,10 @@ public class ServerFrame extends JFrame {
 //				}
 			}
 		});
+		
+		
+		System.setOut(new PrintStream(new StreamCapturer("", textArea, System.out)));
+		//System.setErr(new PrintStream(new StreamCapturer("", textArea, System.err)));
 	}
 	
 	private void output (String s) {
