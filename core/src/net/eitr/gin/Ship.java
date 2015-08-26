@@ -1,5 +1,9 @@
 package net.eitr.gin;
 
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -23,7 +27,7 @@ public class Ship {
     	thrusting = false;
     	parts = new Array<ShipPart>();
     	
-    	// Create the fixture definition for this body
+    	
     	PolygonShape shape = new PolygonShape();
     	shape.set(new float[]{-height/2,-width/2,-height/2,width/2,height/2,width/2,height/2,-width/2});
     	FixtureDef fDef = new FixtureDef();
@@ -35,11 +39,15 @@ public class Ship {
     	shape.dispose();
     	body.setAngularDamping(rotationSpeed*10);
     	
+
 		Pixmap pix = new Pixmap(1, 1, Pixmap.Format.RGB888);
 		pix.setColor(0.8f, 0.0f, 0.8f, 1);
 		pix.fill();
     	sprite = new Sprite(new Texture(pix));
-    	sprite.setBounds(-height/2,-width/2,height,width);
+    	sprite.setBounds(0,0,height,width);
+//    	sprite.setOrigin(height/2f, width/2f);
+    	sprite.setOriginCenter();
+    	
 
 //    	CircleShape circleShape = new CircleShape();
 //    	circleShape.setRadius(width);
@@ -79,7 +87,7 @@ public class Ship {
     
 	public void draw (SpriteBatch g) {
 		sprite.setRotation(body.getAngle()*180f/MathUtils.PI);
-		sprite.setPosition(body.getPosition().x, body.getPosition().y);
+		sprite.setPosition(body.getPosition().x-height/2f, body.getPosition().y-width/2f);
 		sprite.draw(g);
 	}
     

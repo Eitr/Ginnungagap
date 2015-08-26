@@ -36,6 +36,7 @@ public class Rock {
 		PolygonRegion region = new PolygonRegion(new TextureRegion(new Texture(pix)),vertices, getTriangles(vertices));
 //		PolygonRegion region = new PolygonRegion(new TextureRegion(new Texture(pix)),vertices,ect.computeTriangles(vertices).toArray());
 		sprite = new PolygonSprite(region);
+		sprite.setOrigin(0, 0);
 	}
 	
 	private short[] getTriangles (float[] v) {
@@ -49,7 +50,6 @@ public class Rock {
 	}
 
 	public void draw (PolygonSpriteBatch g) {
-		//TODO: fix offset when rotating
 		sprite.setRotation(body.getAngle()*180f/MathUtils.PI);
 		sprite.setPosition(body.getPosition().x, body.getPosition().y);
 		sprite.draw(g);

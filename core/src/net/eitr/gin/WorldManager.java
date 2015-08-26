@@ -80,8 +80,9 @@ public class WorldManager {
 		shapes.setProjectionMatrix(cam.combined);
 		polygons.setProjectionMatrix(cam.combined);
 		
-//		sprites.begin();
-//		sprites.end();
+		sprites.begin();
+		ship.draw(sprites);
+		sprites.end();
 		
 		polygons.begin();
 		for(Rock rock : rocks) {
@@ -93,7 +94,7 @@ public class WorldManager {
 		//for(Ship ship : players) {
 		//	ship.draw(shapes);
 		//}
-		ship.draw(shapes);
+//		ship.draw(shapes);
 		shapes.circle(builder.getPosition().x, builder.getPosition().y, 4);
 		gui.debug("builder",(int)builder.getPosition().x+","+(int)builder.getPosition().y);
 		shapes.end();
