@@ -46,9 +46,9 @@ public class DebugInterface extends Stage {
 		draw();
 	}
 	
-	public void debug (String s, String value) {
+	public void debug (String s, Object value) {
 		if (map.containsKey(s)) {
-			map.get(s).setText(s+": "+value);
+			map.get(s).setText(s+": "+value.toString());
 		} else {
 			Label label = new Label(s+": "+value,style);
 			label.setPosition(10, view.getWorldHeight()-gap*z++);

@@ -8,9 +8,11 @@ public class ShipBuilder {
 
 	float scale,rotation;
 	DrawShapeType shape;
+	float[] shapeData;
 
 	public ShipBuilder () {
-
+		shape = DrawShapeType.RECT;
+		shapeData = new float[]{0,0,4,4};
 	}
 
 
@@ -22,4 +24,5 @@ public class ShipBuilder {
 	public void rotate (float angle) {
 		rotation = (angle+360)%360;
 	}
+	
 }

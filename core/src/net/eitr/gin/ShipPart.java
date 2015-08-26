@@ -1,7 +1,7 @@
 package net.eitr.gin;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 
 import net.eitr.gin.Units.DrawShapeType;
@@ -10,45 +10,45 @@ public class ShipPart {
 
 	Body ship;
 	DrawShapeType type;
-	Vector2 origin;
+	Vector2 pos;
 
-	float [] drawData;
+	float [] data;
 
 
-	public ShipPart (Body b, Vector2 o, float w, float h, float a) {
+	public ShipPart (Body b, Vector2 p, float w, float h, float a) {
 		ship = b;
-		origin = o;
+		pos = p;
 
 		PolygonShape shape = new PolygonShape();
 		FixtureDef fDef = new FixtureDef();
 		setMaterialProperties(fDef);
 
-		shape.setAsBox(w/2f, h/2f, o, a);
+		shape.setAsBox(w/2f, h/2f, p, a);
 		fDef.shape = shape;
 		ship.createFixture(fDef);
 		shape.dispose();
 
 		type = DrawShapeType.RECT;
-		drawData = new float[]{w,h};
+		data = new float[]{w,h};
 	}
 
-	public ShipPart (Body b, Vector2 o, float r) {
+	public ShipPart (Body b, Vector2 p, float r) {
 		ship = b;
-		origin = o;
+		pos = p;
 
 		CircleShape shape = new CircleShape();
 		FixtureDef fDef = new FixtureDef();
 		setMaterialProperties(fDef);
 
 		shape.setRadius(r);
-		shape.setPosition(new Vector2(o.x,o.y));
+		shape.setPosition(p);
 
 		fDef.shape = shape;
 		ship.createFixture(fDef);
 		shape.dispose();
 
 		type = DrawShapeType.CIRCLE;
-		drawData = new float[]{r};
+		data = new float[]{r};
 	}
 
 	private void setMaterialProperties (FixtureDef def) {
@@ -60,16 +60,30 @@ public class ShipPart {
 	public void draw (ShapeRenderer g) {
 		switch(type) {
 		case CIRCLE: 
-			g.circle(origin.x, origin.y, drawData[0]);
+			g.circle(pos.x, pos.y, data[0]);
 			break;
 		case POLYGON:
 			break;
 		case RECT:
-			float w = drawData[0];
-			float h = drawData[1];
-			g.rect(-origin.x-w/2f, -origin.y-h/2f, w, h);
+			float w = data[0];
+			float h = data[1];
+			g.rect(-pos.x-w/2f, -pos.y-h/2f, w, h);
 			break;
 		}
+	}
+	
+	//TODO polygon intersection
+	public boolean intersects (ShipPart part) {
+		if (type == DrawShapeType.CIRCLE && part.type == DrawShapeType.CIRCLE) {
+			return Intersector.overlaps(new Circle(pos,data[0]), new Circle(part.pos,part.data[0]));
+		}
+		else if (type == DrawShapeType.RECT && part.type == DrawShapeType.CIRCLE) {
+			return Intersector.overlaps(new Circle(part.pos,part.data[0]),new Rectangle(pos.x-data[0]/2,pos.y-data[1]/2,data[0],data[1]));
+		}
+		else if (type == DrawShapeType.CIRCLE && part.type == DrawShapeType.RECT) {
+			return Intersector.overlaps(new Circle(pos,data[0]),new Rectangle(part.pos.x-part.data[0]/2,part.pos.y-part.data[1]/2,part.data[0],part.data[1]));
+		}
+		return false;
 	}
 
 }

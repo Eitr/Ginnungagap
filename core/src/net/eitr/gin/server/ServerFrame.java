@@ -15,6 +15,7 @@ import java.awt.GridLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.awt.event.ActionEvent;
 
 @SuppressWarnings("serial")
@@ -101,9 +102,8 @@ public class ServerFrame extends JFrame {
 			}
 		});
 		
-		
-		System.setOut(new PrintStream(new StreamCapturer("", textArea, System.out)));
-		//System.setErr(new PrintStream(new StreamCapturer("", textArea, System.err)));
+		System.setOut(new PrintStream(new StreamCapturer(textArea, System.out)));
+		System.setErr(new PrintStream(new StreamCapturer(textArea, System.err)));
 	}
 	
 	private void output (String s) {
