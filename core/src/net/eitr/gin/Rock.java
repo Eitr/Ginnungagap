@@ -16,10 +16,10 @@ public class Rock {
 	public Rock (Body b) {
 		body = b;
 		size = MathUtils.random(6, 24);
-//		float [] vertices = generateConcavePolygon(size);
+		//		float [] vertices = generateConcavePolygon(size);
 		float [] vertices = generateCircularPolygon(size);
-//		EarClippingTriangulator ect = new EarClippingTriangulator();
-		
+		//		EarClippingTriangulator ect = new EarClippingTriangulator();
+
 		PolygonShape shape = new PolygonShape();
 		shape.set(vertices);
 		FixtureDef fDef = new FixtureDef();
@@ -34,11 +34,11 @@ public class Rock {
 		pix.setColor(0.8f, 0.8f, 0.8f, 1);
 		pix.fill();
 		PolygonRegion region = new PolygonRegion(new TextureRegion(new Texture(pix)),vertices, getTriangles(vertices));
-//		PolygonRegion region = new PolygonRegion(new TextureRegion(new Texture(pix)),vertices,ect.computeTriangles(vertices).toArray());
+		//		PolygonRegion region = new PolygonRegion(new TextureRegion(new Texture(pix)),vertices,ect.computeTriangles(vertices).toArray());
 		sprite = new PolygonSprite(region);
 		sprite.setOrigin(0, 0);
 	}
-	
+
 	private short[] getTriangles (float[] v) {
 		short[] points = new short[(v.length-4)/2*3];
 		for (int i=0; i < points.length/3; i++) {
@@ -60,7 +60,7 @@ public class Rock {
 		int p = 8; // total points around polygon
 		float [] vertices = new float[p*2];
 		float radians = MathUtils.PI*2f/p; // angle between vertices
-		
+
 		for (int i=0; i<p; i++) {
 			float dist = MathUtils.random(r/2,r);
 			vertices[i*2] = MathUtils.cos(i*radians)*dist;
@@ -68,13 +68,13 @@ public class Rock {
 		}
 		return vertices;
 	}
-	
-	
+
+
 	private float[] generateCircularPolygon (float r) {
 		int p = 8; // total points around polygon (LIMIT 8 VERTICES PER POLYGON)
 		float [] vertices = new float[p*2];
 		float radians = MathUtils.PI*2f/p; // angle between vertices
-		
+
 		for (int i=0; i < p; i++) {
 			float angle = MathUtils.random(0f,radians);
 			vertices[i*2] = MathUtils.cos(angle+i*radians)*r;

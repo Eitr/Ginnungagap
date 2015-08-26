@@ -12,7 +12,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Array;
 
 public class WorldManager {
-	
+
 	static DebugInterface gui = Main.gui;
 
 	World world;
@@ -37,12 +37,12 @@ public class WorldManager {
 		createPlayers();
 		createRocks();
 		createWorldEdges();
-		
+
 		BodyDef builderDef = new BodyDef();
 		builderDef.type = BodyType.StaticBody;
 		builderDef.position.set(100, 100);
 		builder = world.createBody(builderDef);
-		
+
 		CircleShape circle = new CircleShape();
 		FixtureDef fDef = new FixtureDef();
 		circle.setRadius(4);
@@ -50,8 +50,8 @@ public class WorldManager {
 		fDef.isSensor = true;
 		builder.createFixture(fDef);
 		builder.setUserData(circle);
-//		circle.dispose();
-		
+		//		circle.dispose();
+
 		world.setContactListener(new ContactListener() {
 			@Override
 			public void beginContact(Contact contact) {
@@ -79,11 +79,10 @@ public class WorldManager {
 		sprites.setProjectionMatrix(cam.combined);
 		shapes.setProjectionMatrix(cam.combined);
 		polygons.setProjectionMatrix(cam.combined);
-		
+
 		sprites.begin();
-		ship.draw(sprites);
 		sprites.end();
-		
+
 		polygons.begin();
 		for(Rock rock : rocks) {
 			rock.draw(polygons);
@@ -94,7 +93,7 @@ public class WorldManager {
 		//for(Ship ship : players) {
 		//	ship.draw(shapes);
 		//}
-//		ship.draw(shapes);
+		ship.draw(shapes);
 		shapes.circle(builder.getPosition().x, builder.getPosition().y, 4);
 		gui.debug("builder",(int)builder.getPosition().x+","+(int)builder.getPosition().y);
 		shapes.end();
@@ -110,11 +109,11 @@ public class WorldManager {
 			world.step(Units.TIME_STEP,6,2);
 			frameTotalTime -= Units.TIME_STEP;
 		}
-		
+
 		builder.setTransform(mousePos, builder.getAngle());
 		gui.debug("mouse","("+(int)mousePos.x+","+(int)mousePos.y+")");
 	}
-	
+
 	public void buildShip () {
 		if (building) {
 			ship.body.createFixture((Shape)builder.getUserData(),0.5f);
@@ -125,21 +124,21 @@ public class WorldManager {
 	public Ship getPlayer () {
 		return ship;
 	}
-	
+
 	public void setMousePosition (Vector3 m) {
 		mousePos.x = m.x;
 		mousePos.y = m.y;
 	}
-	
+
 	private void createPlayers () {
-//		players = new Array<Ship>();
+		//		players = new Array<Ship>();
 		BodyDef shipDef = new BodyDef();
 		shipDef.type = BodyType.DynamicBody;
 		shipDef.position.set(0,0);
 		//players.add(new Ship(world.createBody(shipDef)));
 		ship = new Ship(world.createBody(shipDef));
 	}
-	
+
 	private void createRocks () {
 		rocks = new Array<Rock>();
 		BodyDef rockDef = new BodyDef();
@@ -149,7 +148,7 @@ public class WorldManager {
 			rocks.add(new Rock(world.createBody(rockDef)));
 		}
 	}
-	
+
 	private void init () {
 		world = new World(new Vector2(0,0), true);
 		sprites = new SpriteBatch();
@@ -158,7 +157,7 @@ public class WorldManager {
 		debugRenderer = new Box2DDebugRenderer();
 		mousePos = new Vector2();
 	}
-	
+
 	private void createWorldEdges () {
 		BodyDef edgeDef = new BodyDef();
 		edgeDef.type = BodyType.StaticBody;
@@ -183,7 +182,7 @@ public class WorldManager {
 		edge.createFixture(fDef);
 		edgeShape.dispose();
 	}
-	
+
 	public void dispose() {
 		sprites.dispose();
 		shapes.dispose();
