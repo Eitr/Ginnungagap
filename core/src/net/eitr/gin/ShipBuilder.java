@@ -21,7 +21,7 @@ public class ShipBuilder {
 //		shape = DrawShapeType.RECT;
 		shape = DrawShapeType.CIRCLE;
 		buildNewPart();
-		mouse = new Vector2(0,0)
+		mouse = new Vector2(0,0);
 	}
 	
 	private void buildNewPart () {
@@ -58,18 +58,16 @@ public class ShipBuilder {
 	}
 
 	public void draw (ShapeRenderer g) {
-		
-		//TODO figure out rotation 
-		float x = m.x-ship.getX();
-		float y = m.y-ship.getY();
-		float dist = MathUtils.sqrt(MathUtils.pow(x,2)+MathUtils.pow(y,2));
-		float angle = MathUtils.arctan(y/x);
-		newPart.pos = new Vector2(MathUtils.cos(angle)*dist,MathUtils.sin(angle)*dist);
+		float x = mouse.x-ship.getX();
+		float y = mouse.y-ship.getY();
+		float dist = (float) Math.sqrt(x*x+y*y);
+		float angle = MathUtils.atan2(y, x);
+		newPart.pos = new Vector2(MathUtils.cos(angle-ship.body.getAngle())*dist,MathUtils.sin(angle-ship.body.getAngle())*dist);
 		
 		newPart.draw(g);
 		
 		Main.gui.debug("builder","("+(int)newPart.pos.x+","+(int)newPart.pos.y+")");
-		Main.gui.debug("mouse","("+(int)m.x+","+(int)m.y+")");
+		Main.gui.debug("mouse","("+(int)mouse.x+","+(int)mouse.y+")");
 		Main.gui.debug("collision",ship.intersects(newPart));
 	}
 	

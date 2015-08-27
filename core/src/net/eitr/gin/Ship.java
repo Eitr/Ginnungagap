@@ -49,12 +49,6 @@ public class Ship {
 		thrusting = true;
 	}
 
-	/** Used for checking collision */
-	public void glide () {
-		body.setLinearVelocity(0, 0);
-		body.applyLinearImpulse(1f, 0f, body.getPosition().x, body.getPosition().y, true);
-	}
-
 	public void resetPosition () {
 		body.setTransform(0, 0, 0);
 		body.setLinearVelocity(0, 0);
@@ -62,7 +56,7 @@ public class Ship {
 
 	public void draw (ShapeRenderer g) {
 		g.identity();
-		//TODO: translate vs set position
+		//TODO: translate vs set position (parts are local position based)
 		//TODO: rotation slightly adjusts everything else in the world
 		g.translate(body.getPosition().x, body.getPosition().y, 0);
 		g.rotate(0, 0, 1, (float)(body.getAngle()/Math.PI*180f));

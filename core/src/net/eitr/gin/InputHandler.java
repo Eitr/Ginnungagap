@@ -32,7 +32,7 @@ public class InputHandler implements InputProcessor {
 			ship.rotateRight();
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-			ship.glide();
+
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
 			ship.thrust();
@@ -82,14 +82,12 @@ public class InputHandler implements InputProcessor {
 
 	@Override
 	public boolean keyUp(int keycode) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 
 	@Override
 	public boolean keyTyped(char character) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -105,7 +103,6 @@ public class InputHandler implements InputProcessor {
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
