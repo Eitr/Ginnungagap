@@ -11,51 +11,27 @@ public class ShipPart {
 	Body ship;
 	DrawShapeType type;
 	Vector2 pos;
+	int id;
 
 	float [] data;
 
 
-	public ShipPart (Body b, Vector2 p, float w, float h, float a) {
+	public ShipPart (int i, Body b, Vector2 p, float w, float h, float a) {
+		id = i;
 		ship = b;
 		pos = p;
-
-		PolygonShape shape = new PolygonShape();
-		FixtureDef fDef = new FixtureDef();
-		setMaterialProperties(fDef);
-
-		shape.setAsBox(w/2f, h/2f, p, a);
-		fDef.shape = shape;
-		ship.createFixture(fDef);
-		shape.dispose();
-
 		type = DrawShapeType.RECT;
-		data = new float[]{w,h};
+		data = new float[]{w,h,a};
 	}
 
-	public ShipPart (Body b, Vector2 p, float r) {
+	public ShipPart (int i, Body b, Vector2 p, float r) {
+		id = i;
 		ship = b;
 		pos = p;
-
-		CircleShape shape = new CircleShape();
-		FixtureDef fDef = new FixtureDef();
-		setMaterialProperties(fDef);
-
-		shape.setRadius(r);
-		shape.setPosition(p);
-
-		fDef.shape = shape;
-		ship.createFixture(fDef);
-		shape.dispose();
-
 		type = DrawShapeType.CIRCLE;
 		data = new float[]{r};
 	}
 
-	private void setMaterialProperties (FixtureDef def) {
-		def.density = 1f;
-		def.friction = 0.4f;
-		def.restitution = 0.3f;
-	}
 
 	public void draw (ShapeRenderer g) {
 		switch(type) {
@@ -67,7 +43,7 @@ public class ShipPart {
 		case RECT:
 			float w = data[0];
 			float h = data[1];
-			g.rect(-pos.x-w/2f, -pos.y-h/2f, w, h);
+			g.rect(pos.x-w/2f, pos.y-h/2f, w, h);
 			break;
 		}
 	}
@@ -84,6 +60,10 @@ public class ShipPart {
 			return Intersector.overlaps(new Circle(pos,data[0]),new Rectangle(part.pos.x-part.data[0]/2,part.pos.y-part.data[1]/2,part.data[0],part.data[1]));
 		}
 		return false;
+	}
+	
+	public int getId () {
+		return id;
 	}
 
 }

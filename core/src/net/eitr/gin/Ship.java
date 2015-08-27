@@ -6,36 +6,39 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.IntMap;
 
+
 public class Ship {
 
 	float width, height, thrust, rotationSpeed;
 	boolean thrusting;
 	Body body;
 	IntMap<ShipPart> parts;
+	ShipBuilder shipBuilder;
 
 	public Ship (Body b) {
 		body = b;
 		width = 8;
 		height = 4;
 		thrust = 20f;
-		rotationSpeed = 3.0f;
+		rotationSpeed = 3.0f*32f;
 		thrusting = false;
 		parts = new IntMap<ShipPart>();
-		body.setAngularDamping(rotationSpeed*10);
+		body.setAngularDamping(rotationSpeed*10/32f);
+		shipBuilder = new ShipBuilder(this);
 
-		addNewPart(new ShipPart(body, new Vector2(0,0), width, height, 0));
-		addNewPart(new ShipPart(body, new Vector2(0,0), height/2, width, MathUtils.PI));
-		addNewPart(new ShipPart(body, new Vector2(0,width/2), width/2, height/4, 0));
-		addNewPart(new ShipPart(body, new Vector2(0,-width/2), width/2, height/4, 0));
-		addNewPart(new ShipPart(body, new Vector2(width/2,0), height/2));
+		addNewPart(new ShipPart(getNewPartId(), body, new Vector2(0,0), width, height, 0));
+//		addNewPart(new ShipPart(getNewPartId(), body, new Vector2(0,0), height/2, width, MathUtils.PI));
+//		addNewPart(new ShipPart(getNewPartId(), body, new Vector2(0,width/2), width/2, height/4, 0));
+//		addNewPart(new ShipPart(getNewPartId(), body, new Vector2(0,-width/2), width/2, height/4, 0));
+//		addNewPart(new ShipPart(getNewPartId(), body, new Vector2(width/2,0), height/2));
 	}
 
 	public void rotateLeft () {
-		body.setAngularVelocity(rotationSpeed);
+		body.setAngularVelocity(rotationSpeed/body.getMass());
 	}
 
 	public void rotateRight () {
-		body.setAngularVelocity(-rotationSpeed);
+		body.setAngularVelocity(-rotationSpeed/body.getMass());
 	}
 
 	public void thrust () {
@@ -63,6 +66,7 @@ public class Ship {
 		//TODO: rotation slightly adjusts everything else in the world
 		g.translate(body.getPosition().x, body.getPosition().y, 0);
 		g.rotate(0, 0, 1, (float)(body.getAngle()/Math.PI*180f));
+		shipBuilder.draw(g);
 		g.setColor(1, 1, 0, 1);
 		for (ShipPart p : parts.values()) {
 			p.draw(g);
@@ -78,13 +82,41 @@ public class Ship {
 		g.translate(-body.getPosition().x, -body.getPosition().y, 0);
 		
 		Main.gui.debug("parts",parts.size);
+		Main.gui.debug("mass",body.getMass());
 	}
 	
-	private void addNewPart (ShipPart part) {
-		parts.put(getNewPartId(), part);
+	public void addNewPart (ShipPart part) {
+
+		FixtureDef fDef = new FixtureDef();
+		fDef.density = 1f;
+		fDef.friction = 0.4f;
+		fDef.restitution = 0.3f;
+		
+		switch (part.type) {
+		case CIRCLE:
+			CircleShape circle = new CircleShape();
+			circle.setRadius(part.data[0]);
+			circle.setPosition(part.pos);
+			fDef.shape = circle;
+			body.createFixture(fDef);
+			circle.dispose();
+			break;
+		case RECT:
+			PolygonShape rect = new PolygonShape();
+			rect.setAsBox(part.data[0]/2f, part.data[1]/2f, part.pos, part.data[2]);
+			fDef.shape = rect;
+			body.createFixture(fDef);
+			rect.dispose();
+			break;
+		case POLYGON:
+			break;
+		default:
+			return;
+		}
+		parts.put(part.getId(), part);
 	}
 	
-	private int getNewPartId () {
+	public int getNewPartId () {
 		int id;
 		do {
 			id = MathUtils.random(1,Units.MAX_SHIP_PARTS*10);
@@ -102,5 +134,14 @@ public class Ship {
 
 	public float getY () {
 		return body.getPosition().y;
+	}
+	
+	public boolean intersects (ShipPart part) {
+		for (ShipPart p : parts.values()) {
+			if (p.intersects(part)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

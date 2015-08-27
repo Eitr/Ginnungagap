@@ -40,13 +40,14 @@ public class Main implements ApplicationListener {
 	public void render () {
 		input.handleInput(world.getPlayer(),camera);
 		camera.update();
+		gui.debug("zoom", (int)(camera.zoom*100)/100f);
 
 		Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		gui.update(world);
 		world.draw(camera);
 		world.simulate();
+		gui.update(world);
 	}
 
 	@Override

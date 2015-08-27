@@ -13,15 +13,11 @@ import com.badlogic.gdx.utils.Array;
 
 public class WorldManager {
 
-	static DebugInterface gui = Main.gui;
-
 	World world;
 
 	//Array<Ship> players;
 	Ship ship;
 	Array<Rock> rocks;
-	Body builder;
-	boolean building = false;
 
 	float frameTotalTime = 0;
 
@@ -30,7 +26,6 @@ public class WorldManager {
 	ShapeRenderer shapes;
 
 	Box2DDebugRenderer debugRenderer;
-	Vector2 mousePos;
 
 	public WorldManager () {
 		init();
@@ -38,33 +33,16 @@ public class WorldManager {
 		createRocks();
 		createWorldEdges();
 
-		BodyDef builderDef = new BodyDef();
-		builderDef.type = BodyType.StaticBody;
-		builderDef.position.set(100, 100);
-		builder = world.createBody(builderDef);
-
-		CircleShape circle = new CircleShape();
-		FixtureDef fDef = new FixtureDef();
-		circle.setRadius(4);
-		fDef.shape = circle;
-		fDef.isSensor = true;
-		builder.createFixture(fDef);
-		builder.setUserData(circle);
-		//		circle.dispose();
-
 		world.setContactListener(new ContactListener() {
 			@Override
 			public void beginContact(Contact contact) {
 				if (contact.getFixtureA().getBody() == ship.body || contact.getFixtureB().getBody() == ship.body){
-					building = true;
-					gui.debug("build", building+"");
+
 				}
 			}
 
 			@Override
 			public void endContact(Contact contact) {
-				building = false;
-				gui.debug("build", building+"");
 			}
 
 			@Override
@@ -94,8 +72,6 @@ public class WorldManager {
 		//	ship.draw(shapes);
 		//}
 		ship.draw(shapes);
-		shapes.circle(builder.getPosition().x, builder.getPosition().y, 4);
-		gui.debug("builder",(int)builder.getPosition().x+","+(int)builder.getPosition().y);
 		shapes.end();
 
 		debugRenderer.setDrawVelocities(true);
@@ -109,25 +85,18 @@ public class WorldManager {
 			world.step(Units.TIME_STEP,6,2);
 			frameTotalTime -= Units.TIME_STEP;
 		}
-
-		builder.setTransform(mousePos, builder.getAngle());
-		gui.debug("mouse","("+(int)mousePos.x+","+(int)mousePos.y+")");
 	}
-
+	
 	public void buildShip () {
-		if (building) {
-			ship.body.createFixture((Shape)builder.getUserData(),0.5f);
-			System.out.println("fuck off");
-		}
+		ship.shipBuilder.buildShip(ship);
+	}
+	
+	public void setMousePosition (Vector3 pos) {
+		ship.shipBuilder.setMousePosition(new Vector2(pos.x,pos.y));
 	}
 
 	public Ship getPlayer () {
 		return ship;
-	}
-
-	public void setMousePosition (Vector3 m) {
-		mousePos.x = m.x;
-		mousePos.y = m.y;
 	}
 
 	private void createPlayers () {
@@ -155,7 +124,6 @@ public class WorldManager {
 		polygons = new PolygonSpriteBatch();
 		shapes = new ShapeRenderer();
 		debugRenderer = new Box2DDebugRenderer();
-		mousePos = new Vector2();
 	}
 
 	private void createWorldEdges () {

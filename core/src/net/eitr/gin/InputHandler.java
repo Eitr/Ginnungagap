@@ -1,6 +1,7 @@
 package net.eitr.gin;
 
 import com.badlogic.gdx.Gdx;
+
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.*;
@@ -58,6 +59,7 @@ public class InputHandler implements InputProcessor {
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		world.setMousePosition(camera.unproject(new Vector3(screenX,screenY,0)));
 		return false;
 	}
 
@@ -70,7 +72,10 @@ public class InputHandler implements InputProcessor {
 
 	@Override
 	public boolean keyDown(int keycode) {
-		// TODO Auto-generated method stub
+		switch (keycode) {
+		case Input.Keys.F: 
+			break;
+		}
 		return false;
 	}
 
@@ -91,7 +96,9 @@ public class InputHandler implements InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		world.buildShip();
+		if (button == Input.Buttons.RIGHT) {
+			world.buildShip();
+		}
 		return false;
 	}
 
@@ -105,7 +112,7 @@ public class InputHandler implements InputProcessor {
 
 	@Override
 	public boolean scrolled(int amount) {
-		// TODO Auto-generated method stub
+		camera.zoom += amount/10f*camera.zoom;
 		return false;
 	}
 
