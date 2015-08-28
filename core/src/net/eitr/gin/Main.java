@@ -28,7 +28,7 @@ public class Main implements ApplicationListener {
 
 		gui = new DebugInterface(guiView);
 		world = new WorldManager();
-		input = new InputHandler(world,camera);
+		input = new InputHandler(world.getPlayer(),camera);
 		
 		InputMultiplexer im = new InputMultiplexer();
 		im.addProcessor(gui);
@@ -38,7 +38,7 @@ public class Main implements ApplicationListener {
 
 	@Override
 	public void render () {
-		input.handleInput(world.getPlayer(),camera);
+		input.handleInput();
 		camera.update();
 		gui.debug("zoom", (int)(camera.zoom*100)/100f);
 
