@@ -86,14 +86,6 @@ public class WorldManager {
 			frameTotalTime -= Units.TIME_STEP;
 		}
 	}
-	
-	public void buildShip () {
-		ship.shipBuilder.buildShip(ship);
-	}
-	
-	public void setMousePosition (Vector3 pos) {
-		ship.shipBuilder.setMousePosition(new Vector2(pos.x,pos.y));
-	}
 
 	public Ship getPlayer () {
 		return ship;
