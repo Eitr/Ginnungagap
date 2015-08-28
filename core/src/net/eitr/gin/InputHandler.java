@@ -9,21 +9,20 @@ import com.badlogic.gdx.math.*;
 public class InputHandler implements InputProcessor {
 
 	private OrthographicCamera camera;
-	private WorldManager world;
+	private Ship ship;
 
-	public InputHandler (WorldManager w, OrthographicCamera c) {
-		world = w;
+	public InputHandler (Ship s, OrthographicCamera c) {
+		ship = s;
 		camera = c;
-		Gdx.input.setInputProcessor(this);
 	}
 
 
-	public void handleInput (Ship ship, OrthographicCamera cam) {
+	public void handleInput () {
 		if (Gdx.input.isKeyPressed(Input.Keys.EQUALS)) {
-			cam.zoom -= 0.02;
+			camera.zoom -= 0.02;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.MINUS)) {
-			cam.zoom += 0.02;
+			camera.zoom += 0.02;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
 			ship.rotateLeft();
@@ -44,28 +43,30 @@ public class InputHandler implements InputProcessor {
 			System.out.println("Pos: "+ship.getPosition());
 		}
 
-		cam.position.set(ship.getX(), ship.getY(), 0);
+		camera.position.set(ship.getX(), ship.getY(), 0);
 
 		// Sets min/max for zoom
-		cam.zoom = MathUtils.clamp(cam.zoom, 0.5f, 3f);
+		camera.zoom = MathUtils.clamp(camera.zoom, 0.5f, 3f);
 
 		// Keep the camera inside the boundaries of the map
-		float effectiveViewportWidth = cam.viewportWidth * cam.zoom;
-		float effectiveViewportHeight = cam.viewportHeight * cam.zoom;
-		cam.position.x = MathUtils.clamp(cam.position.x, effectiveViewportWidth / 2f - Units.WORLD_WIDTH/2F, Units.WORLD_WIDTH/2f - effectiveViewportWidth / 2f);
-		cam.position.y = MathUtils.clamp(cam.position.y, effectiveViewportHeight / 2f -Units.WORLD_HEIGHT/2F, Units.WORLD_HEIGHT/2f - effectiveViewportHeight / 2f);
+		float effectiveViewportWidth = camera.viewportWidth * camera.zoom;
+		float effectiveViewportHeight = camera.viewportHeight * camera.zoom;
+		camera.position.x = MathUtils.clamp(camera.position.x, effectiveViewportWidth / 2f - Units.WORLD_WIDTH/2F, Units.WORLD_WIDTH/2f - effectiveViewportWidth / 2f);
+		camera.position.y = MathUtils.clamp(camera.position.y, effectiveViewportHeight / 2f -Units.WORLD_HEIGHT/2F, Units.WORLD_HEIGHT/2f - effectiveViewportHeight / 2f);
 	}
 
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		world.setMousePosition(camera.unproject(new Vector3(screenX,screenY,0)));
+		Vector3 m = camera.unproject(new Vector3(screenX,screenY,0))
+		ship.shipBuilder.setMousePosition(new Vector2(m.x,m.y));
 		return false;
 	}
 
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
-		world.setMousePosition(camera.unproject(new Vector3(screenX,screenY,0)));
+		Vector3 m = camera.unproject(new Vector3(screenX,screenY,0))
+		ship.shipBuilder.setMousePosition(new Vector2(m.x,m.y));
 		return false;
 	}
 
@@ -95,7 +96,7 @@ public class InputHandler implements InputProcessor {
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		if (button == Input.Buttons.RIGHT) {
-			world.buildShip();
+			ship.shipBuilder.buildShip();
 		}
 		return false;
 	}
