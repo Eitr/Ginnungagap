@@ -11,15 +11,19 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Array;
 
+import net.eitr.gin.ship.Projectile;
+import net.eitr.gin.ship.Ship;
+
 public class WorldManager {
 
-	World world;
+	public static World world;
 
 	//Array<Ship> players;
 	Ship ship;
 	Array<Rock> rocks;
 
-	float frameTotalTime = 0;
+	float timeAccumulator = 0;
+	public Array<Projectile> projectiles;
 
 	SpriteBatch sprites;
 	PolygonSpriteBatch polygons;
@@ -68,10 +72,10 @@ public class WorldManager {
 		polygons.end();
 
 		shapes.begin(ShapeType.Filled);
-		//for(Ship ship : players) {
-		//	ship.draw(shapes);
-		//}
 		ship.draw(shapes);
+		for (Projectile p : projectiles) {
+			p.draw(shapes);
+		}
 		shapes.end();
 
 		debugRenderer.setDrawVelocities(true);
@@ -80,10 +84,10 @@ public class WorldManager {
 
 	public void simulate () {
 		world.step(1/300f, 6, 2);
-		frameTotalTime += Gdx.graphics.getDeltaTime();
-		while (frameTotalTime >= Units.TIME_STEP) {
+		timeAccumulator += Gdx.graphics.getDeltaTime();
+		while (timeAccumulator >= Units.TIME_STEP) {
 			world.step(Units.TIME_STEP,6,2);
-			frameTotalTime -= Units.TIME_STEP;
+			timeAccumulator -= Units.TIME_STEP;
 		}
 	}
 
@@ -116,6 +120,7 @@ public class WorldManager {
 		polygons = new PolygonSpriteBatch();
 		shapes = new ShapeRenderer();
 		debugRenderer = new Box2DDebugRenderer();
+		projectiles = new Array<Projectile>();
 	}
 
 	private void createWorldEdges () {

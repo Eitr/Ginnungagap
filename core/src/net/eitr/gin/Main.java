@@ -11,15 +11,14 @@ public class Main implements ApplicationListener {
 
 	OrthographicCamera camera;
 	Viewport gameView, guiView;
-	WorldManager world;
-	static DebugInterface gui;
+	public static WorldManager world;
+	public static DebugInterface gui;
 	InputHandler input;
 	
-	final int viewSize = 8;
 
 	@Override
 	public void create() {
-		gameView = new FitViewport(viewSize*16, viewSize*9); // 16:9 aspect ratio
+		gameView = new FitViewport(Units.VIEW_SIZE*16, Units.VIEW_SIZE*9); // 16:9 aspect ratio
 		guiView = new FitViewport(1600,900);
 		camera = new OrthographicCamera(gameView.getWorldWidth(), gameView.getWorldHeight());
 		gameView.setCamera(camera);

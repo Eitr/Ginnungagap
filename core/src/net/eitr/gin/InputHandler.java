@@ -6,6 +6,8 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.*;
 
+import net.eitr.gin.ship.Ship;
+
 public class InputHandler implements InputProcessor {
 
 	private OrthographicCamera camera;
@@ -74,7 +76,8 @@ public class InputHandler implements InputProcessor {
 	@Override
 	public boolean keyDown(int keycode) {
 		switch (keycode) {
-		case Input.Keys.F: 
+		case Input.Keys.B: 
+			ship.shipBuilder.isBuilding = !ship.shipBuilder.isBuilding;
 			break;
 		}
 		return false;
@@ -95,6 +98,9 @@ public class InputHandler implements InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		if (button == Input.Buttons.LEFT) {
+			ship.shooting = true;
+		}
 		if (button == Input.Buttons.RIGHT) {
 			ship.shipBuilder.buildShip();
 		}
@@ -104,6 +110,7 @@ public class InputHandler implements InputProcessor {
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		ship.shooting = false;
 		return false;
 	}
 
