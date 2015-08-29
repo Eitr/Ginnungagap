@@ -41,7 +41,7 @@ public class ShipBuilder {
 		}
 	}
 
-	public void buildShip (Ship ship) {
+	public void buildShip () {
 		if (newPart != null && ship.intersects(newPart)) {
 			ship.addNewPart(newPart);
 			buildNewPart();

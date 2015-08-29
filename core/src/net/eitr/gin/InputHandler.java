@@ -58,14 +58,14 @@ public class InputHandler implements InputProcessor {
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		Vector3 m = camera.unproject(new Vector3(screenX,screenY,0))
+		Vector3 m = camera.unproject(new Vector3(screenX,screenY,0));
 		ship.shipBuilder.setMousePosition(new Vector2(m.x,m.y));
 		return false;
 	}
 
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
-		Vector3 m = camera.unproject(new Vector3(screenX,screenY,0))
+		Vector3 m = camera.unproject(new Vector3(screenX,screenY,0));
 		ship.shipBuilder.setMousePosition(new Vector2(m.x,m.y));
 		return false;
 	}
