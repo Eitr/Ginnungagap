@@ -51,11 +51,13 @@ public class WorldManager {
 						ShipPart p = (ShipPart)contact.getFixtureA().getUserData();
 						Projectile b = (Projectile)contact.getFixtureB().getBody().getUserData();
 						s.damagePart(p.getId(),b.getDamage());
+						b.remove = true;
 					} else {
 						Ship s = (Ship)contact.getFixtureB().getBody().getUserData();
 						ShipPart p = (ShipPart)contact.getFixtureB().getUserData();
 						Projectile b = (Projectile)contact.getFixtureA().getBody().getUserData();
 						s.damagePart(p.getId(),b.getDamage());
+						b.remove = true;
 					}
 				}
 			}
@@ -132,7 +134,6 @@ public class WorldManager {
 		for (int i = 0; i < Units.WORLD_WIDTH*Units.WORLD_HEIGHT/10000; i++) {
 			rockDef.position.set(MathUtils.random(-Units.WORLD_WIDTH/2f,Units.WORLD_WIDTH/2f),MathUtils.random(-Units.WORLD_HEIGHT/2f,Units.WORLD_HEIGHT/2f));
 			rocks.add(new Rock(world.createBody(rockDef)));
-			System.out.println(i);
 		}
 	}
 
