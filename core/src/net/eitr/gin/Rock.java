@@ -7,18 +7,23 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
-public class Rock {
+import net.eitr.gin.Units.WorldBodyType;
+
+public class Rock extends WorldBody {
 
 	private float size;
 	private PolygonSprite sprite;
 	private Body body;
 
 	public Rock (Body b) {
+		super(WorldBodyType.ROCK);
+		
 		body = b;
+		body.setUserData(this);
 		size = MathUtils.random(6, 24);
+		
 		//		float [] vertices = generateConcavePolygon(size);
 		float [] vertices = generateCircularPolygon(size);
-		//		EarClippingTriangulator ect = new EarClippingTriangulator();
 
 		PolygonShape shape = new PolygonShape();
 		shape.set(vertices);
@@ -34,7 +39,10 @@ public class Rock {
 		pix.setColor(0.8f, 0.8f, 0.8f, 1);
 		pix.fill();
 		PolygonRegion region = new PolygonRegion(new TextureRegion(new Texture(pix)),vertices, getTriangles(vertices));
+
+		//		EarClippingTriangulator ect = new EarClippingTriangulator();
 		//		PolygonRegion region = new PolygonRegion(new TextureRegion(new Texture(pix)),vertices,ect.computeTriangles(vertices).toArray());
+		
 		sprite = new PolygonSprite(region);
 		sprite.setOrigin(0, 0);
 	}

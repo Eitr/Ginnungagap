@@ -6,6 +6,8 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.*;
 
+import net.eitr.gin.Units.DrawShapeType;
+import net.eitr.gin.Units.ShipPartType;
 import net.eitr.gin.ship.Ship;
 
 public class InputHandler implements InputProcessor {
@@ -33,7 +35,6 @@ public class InputHandler implements InputProcessor {
 			ship.rotateRight();
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
 			ship.thrust();
@@ -43,6 +44,23 @@ public class InputHandler implements InputProcessor {
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.P)) {
 			System.out.println("Pos: "+ship.getPosition());
+		}
+		float scale = 0.2f;
+		if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+			ship.shipBuilder.width -= scale;
+			ship.shipBuilder.buildNewPart();
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+			ship.shipBuilder.width += scale;
+			ship.shipBuilder.buildNewPart();
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+			ship.shipBuilder.height += scale;
+			ship.shipBuilder.buildNewPart();
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+			ship.shipBuilder.height -= scale;
+			ship.shipBuilder.buildNewPart();
 		}
 
 		camera.position.set(ship.getX(), ship.getY(), 0);
@@ -79,7 +97,17 @@ public class InputHandler implements InputProcessor {
 		case Input.Keys.B: 
 			ship.shipBuilder.isBuilding = !ship.shipBuilder.isBuilding;
 			break;
+		case Input.Keys.NUM_1: ship.shipBuilder.buildType = ShipPartType.HULL; break;
+		case Input.Keys.NUM_2: ship.shipBuilder.buildType = ShipPartType.WEAPON; break;
+		case Input.Keys.S: 
+			switch(ship.shipBuilder.shape) {
+			case RECT: ship.shipBuilder.shape = DrawShapeType.CIRCLE; break;
+			case CIRCLE: ship.shipBuilder.shape = DrawShapeType.RECT; break;
+			case POLYGON: break;
+			}
+			break;
 		}
+		ship.shipBuilder.buildNewPart();
 		return false;
 	}
 

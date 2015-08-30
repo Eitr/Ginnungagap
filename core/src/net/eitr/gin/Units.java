@@ -13,4 +13,5 @@ public class Units {
 	
 	public static enum DrawShapeType {POLYGON,CIRCLE,RECT};
 	public static enum ShipPartType {WEAPON,HULL};
+	public static enum WorldBodyType {EDGE,SHIP,ROCK,PROJECTILE};
 }

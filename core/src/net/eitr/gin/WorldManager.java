@@ -13,8 +13,8 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Array;
 
-import net.eitr.gin.ship.Projectile;
-import net.eitr.gin.ship.Ship;
+import net.eitr.gin.Units.WorldBodyType;
+import net.eitr.gin.ship.*;
 
 public class WorldManager {
 
@@ -42,8 +42,21 @@ public class WorldManager {
 		world.setContactListener(new ContactListener() {
 			@Override
 			public void beginContact(Contact contact) {
-				if (contact.getFixtureA().getBody() == ship.body || contact.getFixtureB().getBody() == ship.body){
-
+				WorldBodyType fa = ((WorldBody)contact.getFixtureA().getBody().getUserData()).worldBodyType;
+				WorldBodyType fb = ((WorldBody)contact.getFixtureB().getBody().getUserData()).worldBodyType;
+				
+				if ((fa == WorldBodyType.SHIP && fb == WorldBodyType.PROJECTILE) || (fa == WorldBodyType.PROJECTILE && fb == WorldBodyType.SHIP)) {
+					if (fa == WorldBodyType.SHIP) {
+						Ship s = (Ship)contact.getFixtureA().getBody().getUserData();
+						ShipPart p = (ShipPart)contact.getFixtureA().getUserData();
+						Projectile b = (Projectile)contact.getFixtureB().getBody().getUserData();
+						s.damagePart(p.getId(),b.getDamage());
+					} else {
+						Ship s = (Ship)contact.getFixtureB().getBody().getUserData();
+						ShipPart p = (ShipPart)contact.getFixtureB().getUserData();
+						Projectile b = (Projectile)contact.getFixtureA().getBody().getUserData();
+						s.damagePart(p.getId(),b.getDamage());
+					}
 				}
 			}
 
@@ -119,6 +132,7 @@ public class WorldManager {
 		for (int i = 0; i < Units.WORLD_WIDTH*Units.WORLD_HEIGHT/10000; i++) {
 			rockDef.position.set(MathUtils.random(-Units.WORLD_WIDTH/2f,Units.WORLD_WIDTH/2f),MathUtils.random(-Units.WORLD_HEIGHT/2f,Units.WORLD_HEIGHT/2f));
 			rocks.add(new Rock(world.createBody(rockDef)));
+			System.out.println(i);
 		}
 	}
 
@@ -136,6 +150,7 @@ public class WorldManager {
 		edgeDef.type = BodyType.StaticBody;
 		edgeDef.position.set(0, 0);
 		Body edge = world.createBody(edgeDef);
+		edge.setUserData(new WorldBody(WorldBodyType.EDGE));
 		// Create the fixture definition for this body
 		EdgeShape edgeShape = new EdgeShape();
 		FixtureDef fDef = new FixtureDef();
