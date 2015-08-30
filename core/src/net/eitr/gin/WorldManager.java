@@ -1,5 +1,7 @@
 package net.eitr.gin;
 
+import java.util.Iterator;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.*;
@@ -73,12 +75,18 @@ public class WorldManager {
 
 		shapes.begin(ShapeType.Filled);
 		ship.draw(shapes);
-		for (Projectile p : projectiles) {
-			p.draw(shapes);
+		Iterator<Projectile> ps = projectiles.iterator();
+		while (ps.hasNext()) {
+			Projectile p = ps.next();
+			if (p.draw(shapes)) {
+				world.destroyBody(p.body);
+				ps.remove();
+			}
 		}
+		Main.gui.debug("bullets", projectiles.size);
 		shapes.end();
 
-		debugRenderer.setDrawVelocities(true);
+//		debugRenderer.setDrawVelocities(true);
 		debugRenderer.render(world, cam.combined);
 	}
 
