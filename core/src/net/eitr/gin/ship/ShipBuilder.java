@@ -1,13 +1,10 @@
 package net.eitr.gin.ship;
 
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
-import net.eitr.gin.Main;
 import net.eitr.gin.Units.*;
 
 public class ShipBuilder {
@@ -94,24 +91,6 @@ public class ShipBuilder {
 
 	public void rotate (float angle) {
 		rotation = (angle+360)%360;
-	}
-
-	public void draw (ShapeRenderer g) {
-		if (!isBuilding) {
-			return;
-		}
-		float x = mouse.x-ship.getX();
-		float y = mouse.y-ship.getY();
-		float dist = (float) Math.sqrt(x*x+y*y);
-		float angle = MathUtils.atan2(y, x);
-		newPart.pos = new Vector2(MathUtils.cos(angle-ship.body.getAngle())*dist,MathUtils.sin(angle-ship.body.getAngle())*dist);
-
-		newPart.draw(g);
-
-		Main.gui.debug("builder","("+(int)newPart.pos.x+","+(int)newPart.pos.y+")");
-		Main.gui.debug("mouse","("+(int)mouse.x+","+(int)mouse.y+")");
-		Main.gui.debug("collision",ship.intersects(newPart));
-		Main.gui.debug("part type",buildType);
 	}
 
 	public void setMousePosition (Vector2 m) {

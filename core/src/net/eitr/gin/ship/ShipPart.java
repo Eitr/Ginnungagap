@@ -1,6 +1,5 @@
 package net.eitr.gin.ship;
 
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 
@@ -37,22 +36,6 @@ public class ShipPart {
 		type = t;
 		pos = p;
 		health = 100;
-	}
-
-	public void draw (ShapeRenderer g) {
-		g.setColor(0, health/100f, health/100f, 1);
-		switch(drawType) {
-		case CIRCLE: 
-			g.circle(pos.x, pos.y, radius);
-			break;
-		case RECT:
-			float w = width;
-			float h = height;
-			g.rect(pos.x-w/2f, pos.y-h/2f, w, h);
-			break;
-		case POLYGON:
-			break;
-		}
 	}
 	
 	protected void update (boolean isShooting) {}

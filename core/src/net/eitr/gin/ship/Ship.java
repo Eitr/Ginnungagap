@@ -1,6 +1,5 @@
 package net.eitr.gin.ship;
 
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -8,6 +7,7 @@ import com.badlogic.gdx.utils.IntMap;
 
 import net.eitr.gin.*;
 import net.eitr.gin.Units.*;
+import net.eitr.gin.server.WorldBody;
 
 public class Ship extends WorldBody {
 
@@ -64,33 +64,6 @@ public class Ship extends WorldBody {
 		body.setLinearVelocity(0, 0);
 	}
 
-	public void draw (ShapeRenderer g) {
-		g.identity();
-		//TODO: translate vs set position (parts are local position based)
-		//TODO: rotation slightly adjusts everything else in the world
-		g.translate(body.getPosition().x, body.getPosition().y, 0);
-		g.rotate(0, 0, 1, (float)(body.getAngle()/Math.PI*180f));
-		shipBuilder.draw(g);
-		g.setColor(1, 1, 0, 1);
-		for (ShipPart p : parts.values()) {
-			p.draw(g);
-			p.update(shooting);
-		}
-		if (thrusting) {
-			g.setColor(1, 0, 0, 1);
-			g.rect(-MathUtils.random(0,width/2)-width/2,-MathUtils.random(-height/2,height/2),0.5f,0.5f);
-			g.rect(-MathUtils.random(0,width/2)-width/2,-MathUtils.random(-height/2,height/2),0.5f,0.5f);
-			g.rect(-MathUtils.random(0,width/2)-width/2,-MathUtils.random(-height/2,height/2),0.5f,0.5f);
-			thrusting = false;
-		}
-		g.rotate(0, 0, 1, -(float)(body.getAngle()/Math.PI*180f));
-		g.translate(-body.getPosition().x, -body.getPosition().y, 0);
-
-		
-		Main.gui.debug("parts",parts.size);
-		Main.gui.debug("mass",body.getMass());
-	}
-	
 	public int getNewPartId () {
 		int id;
 		do {

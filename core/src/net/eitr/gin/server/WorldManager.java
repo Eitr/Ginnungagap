@@ -1,18 +1,15 @@
-package net.eitr.gin;
+package net.eitr.gin.server;
 
 import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Array;
 
+import net.eitr.gin.Units;
 import net.eitr.gin.Units.WorldBodyType;
 import net.eitr.gin.ship.*;
 
@@ -26,10 +23,6 @@ public class WorldManager {
 
 	float timeAccumulator = 0;
 	public Array<Projectile> projectiles;
-
-	SpriteBatch sprites;
-	PolygonSpriteBatch polygons;
-	ShapeRenderer shapes;
 
 	Box2DDebugRenderer debugRenderer;
 
@@ -74,34 +67,9 @@ public class WorldManager {
 		});
 	}
 
+
 	public void draw (OrthographicCamera cam) {
-		sprites.setProjectionMatrix(cam.combined);
-		shapes.setProjectionMatrix(cam.combined);
-		polygons.setProjectionMatrix(cam.combined);
-
-		sprites.begin();
-		sprites.end();
-
-		polygons.begin();
-		for(Rock rock : rocks) {
-			rock.draw(polygons);
-		}
-		polygons.end();
-
-		shapes.begin(ShapeType.Filled);
-		ship.draw(shapes);
-		Iterator<Projectile> ps = projectiles.iterator();
-		while (ps.hasNext()) {
-			Projectile p = ps.next();
-			if (p.draw(shapes)) {
-				world.destroyBody(p.body);
-				ps.remove();
-			}
-		}
-		Main.gui.debug("bullets", projectiles.size);
-		shapes.end();
-
-//		debugRenderer.setDrawVelocities(true);
+		debugRenderer.setDrawVelocities(true);
 		debugRenderer.render(world, cam.combined);
 	}
 
@@ -111,6 +79,14 @@ public class WorldManager {
 		while (timeAccumulator >= Units.TIME_STEP) {
 			world.step(Units.TIME_STEP,6,2);
 			timeAccumulator -= Units.TIME_STEP;
+		}
+		Iterator<Projectile> ps = projectiles.iterator();
+		while (ps.hasNext()) {
+			Projectile p = ps.next();
+			if (p.remove) {
+				world.destroyBody(p.body);
+				ps.remove();
+			}
 		}
 	}
 
@@ -139,9 +115,6 @@ public class WorldManager {
 
 	private void init () {
 		world = new World(new Vector2(0,0), true);
-		sprites = new SpriteBatch();
-		polygons = new PolygonSpriteBatch();
-		shapes = new ShapeRenderer();
 		debugRenderer = new Box2DDebugRenderer();
 		projectiles = new Array<Projectile>();
 	}
@@ -172,9 +145,4 @@ public class WorldManager {
 		edgeShape.dispose();
 	}
 
-	public void dispose() {
-		sprites.dispose();
-		shapes.dispose();
-		polygons.dispose();
-	}
 }

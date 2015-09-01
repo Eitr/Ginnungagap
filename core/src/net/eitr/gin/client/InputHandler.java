@@ -1,4 +1,4 @@
-package net.eitr.gin;
+package net.eitr.gin.client;
 
 import com.badlogic.gdx.Gdx;
 
@@ -6,6 +6,7 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.*;
 
+import net.eitr.gin.Units;
 import net.eitr.gin.Units.DrawShapeType;
 import net.eitr.gin.Units.ShipPartType;
 import net.eitr.gin.ship.Ship;

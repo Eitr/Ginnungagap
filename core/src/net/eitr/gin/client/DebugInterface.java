@@ -1,4 +1,4 @@
-package net.eitr.gin;
+package net.eitr.gin.client;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -8,6 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
+import net.eitr.gin.server.WorldManager;
 
 public class DebugInterface extends Stage {
 	

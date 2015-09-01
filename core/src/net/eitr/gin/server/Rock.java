@@ -1,4 +1,4 @@
-package net.eitr.gin;
+package net.eitr.gin.server;
 
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;

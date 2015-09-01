@@ -1,4 +1,4 @@
-package net.eitr.gin;
+package net.eitr.gin.server;
 
 import net.eitr.gin.Units.WorldBodyType;
 

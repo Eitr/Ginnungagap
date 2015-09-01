@@ -9,7 +9,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import net.eitr.gin.Units.WorldBodyType;
-import net.eitr.gin.*;
+import net.eitr.gin.server.WorldBody;
 
 
 public class Projectile extends WorldBody {
@@ -51,13 +51,12 @@ public class Projectile extends WorldBody {
 		return damage;
 	}
 
-	public boolean draw (ShapeRenderer g) {
+	public void draw (ShapeRenderer g) {
 		timeAccumulator += Gdx.graphics.getDeltaTime();
 		if (timeAccumulator >= timeToLive || remove) {
-			return true;
+			remove = true;
 		}
 		g.setColor(1f, 0f, 0f, 1f);
 		g.rect(body.getPosition().x-size/2, body.getPosition().y-size/2, size, size);
-		return false;
 	}
 }
