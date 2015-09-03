@@ -17,7 +17,6 @@ import net.eitr.gin.ship.ShipPart;
 
 public class GraphicsManager {
 
-
 	SpriteBatch sprites;
 	PolygonSpriteBatch polygons;
 	ShapeRenderer shapes;
@@ -29,60 +28,91 @@ public class GraphicsManager {
 		shapes = new ShapeRenderer();
 	}
 	
-/*
-	public void WORLDdraw (OrthographicCamera cam) {
+	public void render () {
 		sprites.setProjectionMatrix(cam.combined);
 		shapes.setProjectionMatrix(cam.combined);
 		polygons.setProjectionMatrix(cam.combined);
 
-		sprites.begin();
-		sprites.end();
+		//sprites.begin();
+		//sprites.end();
 
 		polygons.begin();
-		for(Rock rock : rocks) {
-			rock.draw(polygons);
+		for(PolygonData rock : g.rocks) {
+			rock.sprite.draw(polygons);
 		}
 		polygons.end();
 
 		shapes.begin(ShapeType.Filled);
-		ship.draw(shapes);
+		for(ShipData ship : g.ships) {
+			shapes.identity();
+			shapes.translate(ship.x, ship.y, 0);
+			shapes.rotate(0, 0, 1, ship.angle);
+			
+			for (ShapeData part : ship.parts) {
+				shapes.setColor(part.color);
+				
+				if (part instanceof RectData) {
+					shapes.rect(part.x,part.y,part.width,part.height);
+				} else if (part instanceof CircleData) {
+					shapes.circle(part.x,part.y,part.radius);
+				} else {
+					throw new Exception("Unknown shape: "+part.toString());
+				}
+				
+				p.draw(shapes);
+			}
+			shapes.rotate(0, 0, 1, -ship.angle);
+			shapes.translate(-ship.x, -ship.y, 0);
+	
+		}
+		for (ShapeData projectile : g.shapes) {
+			shapes.setColor(projectile.color);
+			if (part instanceof RectData) {
+				shapes.rect(projectile.x,projectile.y,projectile.width,projectile.height);
+			} else if (part instanceof CircleData) {
+				shapes.circle(projectile.x,projectile.y,projectile.radius);
+			} else {
+				throw new Exception("Unknown shape: "+part.toString());
+			}
+		}
+		shapes.end();
+		
+		ServerMain.gui.debug("builder","("+(int)newPart.pos.x+","+(int)newPart.pos.y+")");
+		ServerMain.gui.debug("mouse","("+(int)mouse.x+","+(int)mouse.y+")");
+		ServerMain.gui.debug("collision",ship.intersects(newPart));
+		ServerMain.gui.debug("part type",buildType);
+		ServerMain.gui.debug("parts",parts.size);
+		ServerMain.gui.debug("mass",body.getMass());
+		ServerMain.gui.debug("bullets", projectiles.size);
+	}
+
+	//TODO: server side
+	GraphicsData g = new GraphicsData();
+		
+	public void WORLDdraw (GraphicsData g) {
+		for(Rock rock : rocks) {
+			rock.draw(g);
+		}
+		ship.draw(g);
 		Iterator<Projectile> ps = projectiles.iterator();
 		while (ps.hasNext()) {
 			Projectile p = ps.next();
-			p.draw(shapes);
+			p.draw(g);
 		}
-		Main.gui.debug("bullets", projectiles.size);
-		shapes.end();
 	}
 	
-	public void SHIPdraw (ShapeRenderer g) {
-		g.identity();
-		//TODO: translate vs set position (parts are local position based)
-		//TODO: rotation slightly adjusts everything else in the world
-		g.translate(body.getPosition().x, body.getPosition().y, 0);
-		g.rotate(0, 0, 1, (float)(body.getAngle()/Math.PI*180f));
-		shipBuilder.draw(g);
-		g.setColor(1, 1, 0, 1);
+	public void SHIPdraw (GraphicsData g) {
+		ShipData shipData = new ShipData(body.getPosition().x, body.getPosition().y, body.getAngle());
+		shipBuilder.draw(shipData);
 		for (ShipPart p : parts.values()) {
 			p.draw(g);
-			p.update(shooting);
+			p.update(shooting);//TODO move to simulation
 		}
-		if (thrusting) {
-			g.setColor(1, 0, 0, 1);
-			g.rect(-MathUtils.random(0,width/2)-width/2,-MathUtils.random(-height/2,height/2),0.5f,0.5f);
-			g.rect(-MathUtils.random(0,width/2)-width/2,-MathUtils.random(-height/2,height/2),0.5f,0.5f);
-			g.rect(-MathUtils.random(0,width/2)-width/2,-MathUtils.random(-height/2,height/2),0.5f,0.5f);
-			thrusting = false;
-		}
-		g.rotate(0, 0, 1, -(float)(body.getAngle()/Math.PI*180f));
-		g.translate(-body.getPosition().x, -body.getPosition().y, 0);
-
-		Main.gui.debug("parts",parts.size);
-		Main.gui.debug("mass",body.getMass());
+		g.ships.add(shipData);
 	}
 	
 
-	public void BUILDERdraw (ShapeRenderer g) {
+	public void BUILDERdraw (ShipData shipData) {
 		if (!isBuilding) {
 			return;
 		}
@@ -92,31 +122,32 @@ public class GraphicsManager {
 		float angle = MathUtils.atan2(y, x);
 		newPart.pos = new Vector2(MathUtils.cos(angle-ship.body.getAngle())*dist,MathUtils.sin(angle-ship.body.getAngle())*dist);
 
-		newPart.draw(g);
-
-		ServerMain.gui.debug("builder","("+(int)newPart.pos.x+","+(int)newPart.pos.y+")");
-		ServerMain.gui.debug("mouse","("+(int)mouse.x+","+(int)mouse.y+")");
-		ServerMain.gui.debug("collision",ship.intersects(newPart));
-		ServerMain.gui.debug("part type",buildType);
+		newPart.draw(shipData);
 	}
 	
 
-	public void PARTdraw (ShapeRenderer g) {
-		g.setColor(0, health/100f, health/100f, 1);
+	public void PARTdraw (ShipData shipData) {
+		ShapeData shape;
 		switch(drawType) {
-		case CIRCLE: 
-			g.circle(pos.x, pos.y, radius);
-			break;
-		case RECT:
-			float w = width;
-			float h = height;
-			g.rect(pos.x-w/2f, pos.y-h/2f, w, h);
-			break;
-		case POLYGON:
-			break;
+		case CIRCLE: shape = new CircleData(pos.x, pos.y, radius); break;
+		case RECT: shape = new RectData(pos.x-width/2f, pos.y-height/2f, width, height); break;
+		default: break;
 		}
+		shape.setColor(0, health/100f, health/100f, 1);
+		shipData.parts.add(shape);
 	}
-*/
+
+	public void ROCKdraw (GraphicsData g) {
+		g.rocks.add(new PolygonData(body.getPosition().x, body.getPosition().y, body.getAngle(), sprite));
+	}
+
+	public void PROJECTILEdraw (GraphicsData g) {
+		RectData rect = new RectData(body.getPosition().x-size/2, body.getPosition().y-size/2, size, size);
+		rect.setColor(1f, 0f, 0f, 1f);
+		g.shapes.add(rect);
+	}
+
+
 	public void dispose() {
 		sprites.dispose();
 		shapes.dispose();
