@@ -57,12 +57,6 @@ public class Rock extends WorldBody {
 		return points;
 	}
 
-	public void draw (PolygonSpriteBatch g) {
-		sprite.setRotation(body.getAngle()*180f/MathUtils.PI);
-		sprite.setPosition(body.getPosition().x, body.getPosition().y);
-		sprite.draw(g);
-	}
-
 	@SuppressWarnings("unused")
 	private float[] generateConcavePolygon (float r) {
 		int p = 8; // total points around polygon
