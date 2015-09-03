@@ -8,17 +8,18 @@ import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
 
 import net.eitr.gin.Units;
 import net.eitr.gin.Units.WorldBodyType;
+import net.eitr.gin.network.InputData;
 import net.eitr.gin.ship.*;
 
 public class WorldManager {
 
 	public static World world;
 
-	//Array<Ship> players;
-	Ship ship;
+	IntMap<Ship> players;
 	Array<Rock> rocks;
 
 	float timeAccumulator = 0;
@@ -28,7 +29,6 @@ public class WorldManager {
 
 	public WorldManager () {
 		init();
-		createPlayers();
 		createRocks();
 		createWorldEdges();
 
@@ -90,17 +90,21 @@ public class WorldManager {
 		}
 	}
 
-	public Ship getPlayer () {
-		return ship;
+	public void doPlayerInput (int id, InputData input) {
+		players.get(id).handleInput(input);
 	}
 
-	private void createPlayers () {
-		//		players = new Array<Ship>();
+	public void createPlayer (int id) {
 		BodyDef shipDef = new BodyDef();
 		shipDef.type = BodyType.DynamicBody;
 		shipDef.position.set(0,0);
 		//players.add(new Ship(world.createBody(shipDef)));
-		ship = new Ship(world.createBody(shipDef));
+		players.put(id, new Ship(world.createBody(shipDef)));
+	}
+	
+	public void removePlayer (int id) {
+		world.destroyBody(players.get(id).body);
+		players.remove(id);
 	}
 
 	private void createRocks () {

@@ -11,5 +11,9 @@ public class Network {
 //	    Kryo kryo = client.getKryo();
 //	    kryo.register(SomeRequest.class);
 //	    kryo.register(SomeResponse.class);
+		
+		kryo.register(ShapeData.class);
+		kryo.register(InputData.class);
+		
 	}
 }

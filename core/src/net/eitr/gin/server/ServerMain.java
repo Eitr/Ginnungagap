@@ -5,7 +5,7 @@ import java.io.IOException;
 import com.badlogic.gdx.ApplicationListener;
 import com.esotericsoftware.kryonet.*;
 
-import net.eitr.gin.network.Network;
+import net.eitr.gin.network.*;
 
 public class ServerMain implements ApplicationListener {
 
@@ -23,15 +23,20 @@ public class ServerMain implements ApplicationListener {
 			
 			// PLAYER INPUT
 			server.addListener(new Listener() {
-				public void received (Connection connection, Object object) {
-//					if (object instanceof SomeRequest) {
-//						SomeRequest request = (SomeRequest)object;
-//						System.out.println(request.text);
-//
-//						SomeResponse response = new SomeResponse();
-//						response.text = "Thanks";
-//						connection.sendTCP(response);
-//					}
+				public void connected (Connection client) {
+					world.createPlayer(client.getID());
+				}
+				
+				public void disconnected (Connection client) {
+					world.removePlayer(client.getID());
+				}
+				
+				public void received (Connection client, Object object) {
+					int id = client.getID();
+					if (object instanceof InputData) {
+						InputData input = (InputData)object;
+						world.doPlayerInput(id,input);
+					}
 				}
 			});
 		} catch (IOException e) {

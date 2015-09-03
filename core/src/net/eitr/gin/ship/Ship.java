@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.IntMap;
 
 import net.eitr.gin.*;
 import net.eitr.gin.Units.*;
+import net.eitr.gin.network.InputData;
 import net.eitr.gin.server.WorldBody;
 
 public class Ship extends WorldBody {
@@ -91,5 +92,9 @@ public class Ship extends WorldBody {
 			}
 		}
 		return false;
+	}
+	
+	public void handleInput (InputData input) {
+		//TODO
 	}
 }
