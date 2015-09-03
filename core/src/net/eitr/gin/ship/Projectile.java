@@ -50,13 +50,13 @@ public class Projectile extends WorldBody {
 	public float getDamage () {
 		return damage;
 	}
-
-	public void draw (ShapeRenderer g) {
+	
+	//TODO simulate
+	public void update () {
 		timeAccumulator += Gdx.graphics.getDeltaTime();
 		if (timeAccumulator >= timeToLive || remove) {
 			remove = true;
 		}
-		g.setColor(1f, 0f, 0f, 1f);
-		g.rect(body.getPosition().x-size/2, body.getPosition().y-size/2, size, size);
 	}
+
 }
