@@ -3,9 +3,10 @@ package net.eitr.gin.desktop;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import net.eitr.gin.*;
+import net.eitr.gin.client.ClientMain;
 import net.eitr.gin.server.ServerMain;
 
-public class DesktopLauncher {
+public class ClientLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		
@@ -15,8 +16,7 @@ public class DesktopLauncher {
 		config.vSyncEnabled = true;
 		config.width = 1600;
 		config.height = 900;
-//		config.title = Main.version;
 		
-		new LwjglApplication(new ServerMain(), config);
+		new LwjglApplication(new ClientMain(), config);
 	}
 }

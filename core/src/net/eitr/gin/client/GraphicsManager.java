@@ -29,7 +29,7 @@ public class GraphicsManager {
 		shapes = new ShapeRenderer();
 	}
 	
-
+/*
 	public void WORLDdraw (OrthographicCamera cam) {
 		sprites.setProjectionMatrix(cam.combined);
 		shapes.setProjectionMatrix(cam.combined);
@@ -116,7 +116,7 @@ public class GraphicsManager {
 			break;
 		}
 	}
-
+*/
 	public void dispose() {
 		sprites.dispose();
 		shapes.dispose();
