@@ -37,7 +37,15 @@ public class GraphicsManager {
 
 		polygons.begin();
 		for(PolygonData rock : data.rocks) {
-			rock.sprite.draw(polygons);
+			Pixmap pix = new Pixmap(1, 1, Pixmap.Format.RGB888);
+			pix.setColor(rock.color);
+			pix.fill();
+			PolygonRegion region = new PolygonRegion(new TextureRegion(new Texture(pix)), rock.vertices, Rock.getTriangles(rock.vertices));
+			PolygonSprite sprite = new PolygonSprite(region);
+			sprite.setOrigin(0, 0);
+			sprite.setRotation(rock.angle);
+			sprite.setPosition(rock.x,rock.y);
+			sprite.draw(polygons);
 		}
 		polygons.end();
 
