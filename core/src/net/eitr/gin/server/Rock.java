@@ -14,8 +14,8 @@ import net.eitr.gin.network.PolygonData;
 public class Rock extends WorldBody {
 
 	private float size;
-	private PolygonSprite sprite;
 	private Body body;
+	float [] vertices;
 
 	public Rock (Body b) {
 		super(WorldBodyType.ROCK);
@@ -25,7 +25,7 @@ public class Rock extends WorldBody {
 		size = MathUtils.random(6, 24);
 		
 		//		float [] vertices = generateConcavePolygon(size);
-		float [] vertices = generateCircularPolygon(size);
+		vertices = generateCircularPolygon(size);
 
 		PolygonShape shape = new PolygonShape();
 		shape.set(vertices);
@@ -36,20 +36,9 @@ public class Rock extends WorldBody {
 		fDef.restitution = 0.1f;
 		body.createFixture(fDef);
 		shape.dispose();
-
-		Pixmap pix = new Pixmap(1, 1, Pixmap.Format.RGB888);
-		pix.setColor(0.8f, 0.8f, 0.8f, 1);
-		pix.fill();
-		PolygonRegion region = new PolygonRegion(new TextureRegion(new Texture(pix)),vertices, getTriangles(vertices));
-
-		//		EarClippingTriangulator ect = new EarClippingTriangulator();
-		//		PolygonRegion region = new PolygonRegion(new TextureRegion(new Texture(pix)),vertices,ect.computeTriangles(vertices).toArray());
-		
-		sprite = new PolygonSprite(region);
-		sprite.setOrigin(0, 0);
 	}
 
-	private short[] getTriangles (float[] v) {
+	public static short[] getTriangles (float[] v) {
 		short[] points = new short[(v.length-4)/2*3];
 		for (int i=0; i < points.length/3; i++) {
 			points[i*3] = 0;
@@ -87,6 +76,8 @@ public class Rock extends WorldBody {
 	}
 
 	public void getGraphics (GraphicsData g) {
-		g.rocks.add(new PolygonData(body.getPosition().x, body.getPosition().y, body.getAngle(), sprite));
+		PolygonData poly = new PolygonData(body.getPosition().x, body.getPosition().y, body.getAngle(), vertices);
+		poly.setColor(0.8f, 0.8f, 0.8f, 1);
+		g.rocks.add(poly);
 	}
 }
