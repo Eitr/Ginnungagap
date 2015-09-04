@@ -8,6 +8,8 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import net.eitr.gin.Units.WorldBodyType;
+import net.eitr.gin.network.GraphicsData;
+import net.eitr.gin.network.PolygonData;
 
 public class Rock extends WorldBody {
 
@@ -71,7 +73,6 @@ public class Rock extends WorldBody {
 		return vertices;
 	}
 
-
 	private float[] generateCircularPolygon (float r) {
 		int p = 8; // total points around polygon (LIMIT 8 VERTICES PER POLYGON)
 		float [] vertices = new float[p*2];
@@ -85,4 +86,7 @@ public class Rock extends WorldBody {
 		return vertices;
 	}
 
+	public void getGraphics (GraphicsData g) {
+		g.rocks.add(new PolygonData(body.getPosition().x, body.getPosition().y, body.getAngle(), sprite));
+	}
 }

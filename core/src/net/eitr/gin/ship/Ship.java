@@ -7,7 +7,9 @@ import com.badlogic.gdx.utils.IntMap;
 
 import net.eitr.gin.*;
 import net.eitr.gin.Units.*;
+import net.eitr.gin.network.GraphicsData;
 import net.eitr.gin.network.InputData;
+import net.eitr.gin.network.ShipData;
 import net.eitr.gin.server.WorldBody;
 
 public class Ship extends WorldBody {
@@ -96,5 +98,20 @@ public class Ship extends WorldBody {
 	
 	public void handleInput (InputData input) {
 		//TODO
+	}
+
+	public void update () {
+		for (ShipPart part : parts.values()) {
+			part.update(shooting);
+		}
+	}
+	
+	public void getGraphics (GraphicsData g) {
+		ShipData shipData = new ShipData(body.getPosition().x, body.getPosition().y, body.getAngle());
+		shipBuilder.getGraphics(shipData);
+		for (ShipPart part : parts.values()) {
+			part.getGraphics(shipData);
+		}
+		g.ships.add(shipData);
 	}
 }

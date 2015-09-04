@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.IntMap;
 
 import net.eitr.gin.Units;
 import net.eitr.gin.Units.WorldBodyType;
+import net.eitr.gin.network.GraphicsData;
 import net.eitr.gin.network.InputData;
 import net.eitr.gin.ship.*;
 
@@ -72,6 +73,20 @@ public class WorldManager {
 		debugRenderer.setDrawVelocities(true);
 		debugRenderer.render(world, cam.combined);
 	}
+	
+	public void getGraphics (GraphicsData g) {
+		for(Rock rock : rocks) {
+			rock.getGraphics(g);
+		}
+		for(Ship ship : players.values()) {
+			ship.getGraphics(g);
+		}
+		Iterator<Projectile> ps = projectiles.iterator();
+		while (ps.hasNext()) {
+			Projectile p = ps.next();
+			p.getGraphics(g);
+		}
+	}
 
 	public void simulate () {
 		world.step(1/300f, 6, 2);
@@ -80,9 +95,13 @@ public class WorldManager {
 			world.step(Units.TIME_STEP,6,2);
 			timeAccumulator -= Units.TIME_STEP;
 		}
+		for (Ship ship : players.values()) {
+			ship.update();
+		}
 		Iterator<Projectile> ps = projectiles.iterator();
 		while (ps.hasNext()) {
 			Projectile p = ps.next();
+			p.update();
 			if (p.remove) {
 				world.destroyBody(p.body);
 				ps.remove();
@@ -121,6 +140,7 @@ public class WorldManager {
 		world = new World(new Vector2(0,0), true);
 		debugRenderer = new Box2DDebugRenderer();
 		projectiles = new Array<Projectile>();
+		players = new IntMap<Ship>();
 	}
 
 	private void createWorldEdges () {

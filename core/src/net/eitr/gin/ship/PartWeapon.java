@@ -45,5 +45,5 @@ public class PartWeapon extends ShipPart {
 		
 		ServerMain.world.projectiles.add(new Projectile(WorldManager.world.createBody(bulletDef), ship.getLinearVelocity(), ship.getAngle()));
 	}
-
+	
 }

@@ -1,7 +1,6 @@
 package net.eitr.gin.ship;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -9,6 +8,8 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import net.eitr.gin.Units.WorldBodyType;
+import net.eitr.gin.network.GraphicsData;
+import net.eitr.gin.network.RectData;
 import net.eitr.gin.server.WorldBody;
 
 
@@ -51,12 +52,17 @@ public class Projectile extends WorldBody {
 		return damage;
 	}
 	
-	//TODO simulate
 	public void update () {
 		timeAccumulator += Gdx.graphics.getDeltaTime();
 		if (timeAccumulator >= timeToLive || remove) {
 			remove = true;
 		}
+	}
+
+	public void getGraphics (GraphicsData g) {
+		RectData rect = new RectData(body.getPosition().x-size/2, body.getPosition().y-size/2, size, size);
+		rect.setColor(1f, 0f, 0f, 1f);
+		g.shapes.add(rect);
 	}
 
 }
