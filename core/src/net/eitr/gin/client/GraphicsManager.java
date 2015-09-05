@@ -1,13 +1,20 @@
 package net.eitr.gin.client;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.PolygonRegion;
+import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.esotericsoftware.minlog.Log;
+import com.badlogic.gdx.utils.Array;
 
 import net.eitr.gin.network.*;
+import net.eitr.gin.server.Rock;
 
 public class GraphicsManager {
 
@@ -15,15 +22,24 @@ public class GraphicsManager {
 	PolygonSpriteBatch polygons;
 	ShapeRenderer shapes;
 	GraphicsData data;
+	TextureRegion rockTexture;
 	
 	public GraphicsManager () {
 		sprites = new SpriteBatch();
 		polygons = new PolygonSpriteBatch();
 		shapes = new ShapeRenderer();
 		data = new GraphicsData();
+		
+		Pixmap pix = new Pixmap(1, 1, Pixmap.Format.RGB888);
+		pix.setColor(new Color(1,1,1,1));
+		pix.fill();
+		rockTexture = new TextureRegion(new Texture(pix));
 	}
 	
 	public void setGraphicsData (GraphicsData d) {
+		data.rocks.clear();
+		data.shapes.clear();
+		data.ships.clear();
 		data = d;
 	}
 	
@@ -31,17 +47,21 @@ public class GraphicsManager {
 		sprites.setProjectionMatrix(camera.combined);
 		shapes.setProjectionMatrix(camera.combined);
 		polygons.setProjectionMatrix(camera.combined);
-
+		
 		//sprites.begin();
 		//sprites.end();
 
 		polygons.begin();
-		for(PolygonData rock : data.rocks) {
-			Pixmap pix = new Pixmap(1, 1, Pixmap.Format.RGB888);
-			pix.setColor(rock.color);
-			pix.fill();
-			PolygonRegion region = new PolygonRegion(new TextureRegion(new Texture(pix)), rock.vertices, Rock.getTriangles(rock.vertices));
+		Array<PolygonData> rocks = new Array<PolygonData>(data.rocks);
+		for(PolygonData rock : rocks) {
+			if (rockTexture == null) {
+				System.out.println("TEXTURE");
+			} else if (rock.vertices == null) {
+				System.out.println("TEXTURE");
+			}
+			PolygonRegion region = new PolygonRegion(rockTexture, rock.vertices, Rock.getTriangles(rock.vertices));
 			PolygonSprite sprite = new PolygonSprite(region);
+			sprite.setColor(rock.color);
 			sprite.setOrigin(0, 0);
 			sprite.setRotation(rock.angle);
 			sprite.setPosition(rock.x,rock.y);
@@ -50,7 +70,7 @@ public class GraphicsManager {
 		polygons.end();
 
 		shapes.begin(ShapeType.Filled);
-		for(ShipData ship : data.ships) {
+		for (ShipData ship : data.ships) {
 			shapes.identity();
 			shapes.translate(ship.x, ship.y, 0);
 			shapes.rotate(0, 0, 1, ship.angle);
@@ -99,5 +119,6 @@ public class GraphicsManager {
 		sprites.dispose();
 		shapes.dispose();
 		polygons.dispose();
+		rockTexture.getTexture().dispose();
 	}
 }

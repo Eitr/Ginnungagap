@@ -1,15 +1,12 @@
 package net.eitr.gin.server;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.utils.IntMap;
 import com.esotericsoftware.kryonet.*;
-import com.esotericsoftware.minlog.Log;
 
 import net.eitr.gin.network.*;
-import net.eitr.gin.ship.Ship;
 
 public class ServerMain implements ApplicationListener {
 
@@ -22,7 +19,7 @@ public class ServerMain implements ApplicationListener {
 	public void create() {
 		data = new GraphicsData();
 		try {
-			server = new Server();
+			server = new Server(2048000,1024000);
 			Network.registerClasses(server.getKryo());
 			server.start();
 			server.bind(54555, 54777);
@@ -58,7 +55,9 @@ public class ServerMain implements ApplicationListener {
 		world.getGraphics(data);
 		IntMap.Keys keys = world.players.keys();
 		while (keys.hasNext) {
-			server.sendToTCP(keys.next(),data);
+			int id = keys.next();
+			data.setPlayerPosition(world.getPlayerPosition(id));
+			server.sendToTCP(id,data);
 		}
 		world.simulate();
 	}

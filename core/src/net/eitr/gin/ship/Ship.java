@@ -1,5 +1,6 @@
 package net.eitr.gin.ship;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -15,7 +16,7 @@ import net.eitr.gin.server.WorldBody;
 public class Ship extends WorldBody {
 
 	float width, height, thrust, rotationSpeed;
-	public boolean thrusting, shooting;
+	private boolean thrusting, shooting, turningLeft, turningRight;
 	public Body body;
 	IntMap<ShipPart> parts;
 	public ShipBuilder shipBuilder;
@@ -46,15 +47,15 @@ public class Ship extends WorldBody {
 		parts.get(id).damage(damage);
 	}
 
-	public void rotateLeft () {
+	private void rotateLeft () {
 		body.setAngularVelocity(rotationSpeed/body.getMass());
 	}
 
-	public void rotateRight () {
+	private void rotateRight () {
 		body.setAngularVelocity(-rotationSpeed/body.getMass());
 	}
 
-	public void thrust () {
+	private void thrust () {
 		float xforce = (float)(Math.cos(body.getAngle())*thrust);
 		float yforce = (float)(Math.sin(body.getAngle())*thrust);
 		//    	body.applyForceToCenter(xforce,yforce,true);
@@ -97,7 +98,77 @@ public class Ship extends WorldBody {
 	}
 	
 	public void handleInput (InputData input) {
-		//TODO
+		shipBuilder.mouse = new Vector2(input.mx, input.my);
+		
+		for (int key : input.keysDown) {
+			switch(key) {
+			case Input.Keys.W: thrusting = true; break;
+			case Input.Keys.A: turningLeft = true; break;
+			case Input.Keys.D: turningRight = true; break;
+			case Input.Keys.R: resetPosition(); break;
+			case Input.Keys.B: shipBuilder.isBuilding = !shipBuilder.isBuilding;
+				shipBuilder.buildNewPart(); break;
+			case Input.Keys.NUM_1: shipBuilder.buildType = ShipPartType.HULL; 
+				shipBuilder.buildNewPart(); break;
+			case Input.Keys.NUM_2: shipBuilder.buildType = ShipPartType.WEAPON; 
+				shipBuilder.buildNewPart(); break;
+			case Input.Keys.S: 
+				switch(shipBuilder.shape) {
+				case RECT: shipBuilder.shape = DrawShapeType.CIRCLE; break;
+				case CIRCLE: shipBuilder.shape = DrawShapeType.RECT; break;
+				case POLYGON: break;
+				}
+				shipBuilder.buildNewPart(); break;
+			}
+//			float scale = 0.2f;
+//			if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+//				ship.shipBuilder.width -= scale;
+//				ship.shipBuilder.buildNewPart();
+//			}
+//			if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+//				ship.shipBuilder.width += scale;
+//				ship.shipBuilder.buildNewPart();
+//			}
+//			if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+//				ship.shipBuilder.height += scale;
+//				ship.shipBuilder.buildNewPart();
+//			}
+//			if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+//				ship.shipBuilder.height -= scale;
+//				ship.shipBuilder.buildNewPart();
+//			}
+		}
+		
+		for (int key : input.keysUp) {
+			switch(key) {
+			case Input.Keys.W: thrusting = false; break;
+			case Input.Keys.A: turningLeft = false; break;
+			case Input.Keys.D: turningRight = false; break;
+			}
+		}
+		
+		if (input.mouseDown) {
+			if (shipBuilder.isBuilding) {
+				shipBuilder.buildShip();
+			} else {
+				shooting = true;
+			}
+		}
+		if (input.mouseUp) {
+			shooting = false;
+		}
+	
+		if (thrusting) {
+			thrust();
+		}
+		
+		if (turningLeft) {
+			rotateLeft();
+		}
+		
+		if (turningRight) {
+			rotateRight();
+		}
 	}
 
 	public void update () {

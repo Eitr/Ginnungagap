@@ -112,6 +112,10 @@ public class WorldManager {
 	public void doPlayerInput (int id, InputData input) {
 		players.get(id).handleInput(input);
 	}
+	
+	public Vector2 getPlayerPosition (int id) {
+		return players.get(id).getPosition();
+	}
 
 	public void createPlayer (int id) {
 		BodyDef shipDef = new BodyDef();

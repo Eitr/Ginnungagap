@@ -32,19 +32,20 @@ public class GameScreen implements Screen {
 		graphics = new GraphicsManager();
 		
 //		gui = new DebugInterface(guiView);
-//		input = new InputHandler(world.getPlayer(),camera);
+		input = new InputHandler(camera);
 //		
 //		InputMultiplexer im = new InputMultiplexer();
 //		im.addProcessor(gui);
 //		im.addProcessor(input);
 //		Gdx.input.setInputProcessor(im);
+		Gdx.input.setInputProcessor(input);
 		
 		networkConnection();
 	}
 	
 	private void networkConnection () {
 		try {
-			client = new Client();
+			client = new Client(2048000,1024000);
 			Network.registerClasses(client.getKryo());
 		    client.start();
 		    client.connect(5000, "127.0.0.1", 54555, 54777);
@@ -64,8 +65,11 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-//		input.handleInput();
+		input.handleCameraInput();
+		camera.position.set(graphics.data.x, graphics.data.y, 0);
 		camera.update();
+		
+		client.sendTCP(input.getInputData());
 
 		Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);

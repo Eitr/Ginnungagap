@@ -1,10 +1,13 @@
 package net.eitr.gin.network;
 
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 public class InputData {
 	
 	public boolean mouseDown, mouseUp;
-	public Vector2 mousePos;
-	public float deltaX, deltaY;
+	public float mx,my;
+	public Array<Integer> keysDown;
+	public Array<Integer> keysUp;
+	
+	public InputData () {}
 }
