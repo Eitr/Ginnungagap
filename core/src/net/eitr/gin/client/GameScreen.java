@@ -23,7 +23,7 @@ public class GameScreen implements Screen {
 	private GraphicsManager graphics;
 	
 	public GameScreen (String ip) {
-		gameView = new FitViewport(Units.VIEW_SIZE*16, Units.VIEW_SIZE*9); // 16:9 aspect ratio
+		gameView = new FitViewport(Units.VIEW_SIZE, Units.VIEW_SIZE/16*9); // 16:9 aspect ratio
 		guiView = new FitViewport(1366,768);//1600,900);
 		camera = new OrthographicCamera(gameView.getWorldWidth(), gameView.getWorldHeight());
 		gameView.setCamera(camera);
@@ -45,7 +45,7 @@ public class GameScreen implements Screen {
 	
 	private void networkConnection (String ip) {
 		try {
-			client = new Client(2048000,1024000);
+			client = new Client(Units.NETWORK_BUFFER_SIZE, Units.NETWORK_OBJECT_SIZE);
 			Network.registerClasses(client.getKryo());
 		    client.start();
 		    client.connect(5000, ip, Units.TCP_PORT, Units.UDP_PORT);
@@ -54,6 +54,8 @@ public class GameScreen implements Screen {
 		        public void received (Connection connection, Object object) {
 		        	if (object instanceof GraphicsData) {
 		        		graphics.setGraphicsData((GraphicsData)object);
+		        		client.updateReturnTripTime();
+		        		gui.debug("ping", client.getReturnTripTime());
 		        	}
 		        }
 		     });
@@ -64,17 +66,17 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
+		Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		
 		input.handleCameraInput();
 		camera.position.set(graphics.data.x, graphics.data.y, 0);
 		camera.update();
 		
 		client.sendTCP(input.getInputData());
 
-		Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		graphics.render(camera);
-		
-		gui.update();
+//		gui.update();
 	}
 
 	@Override

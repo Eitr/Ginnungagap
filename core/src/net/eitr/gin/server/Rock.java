@@ -1,10 +1,12 @@
 package net.eitr.gin.server;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
+import net.eitr.gin.Units;
 import net.eitr.gin.Units.WorldBodyType;
 import net.eitr.gin.network.GraphicsData;
 import net.eitr.gin.network.PolygonData;
@@ -73,7 +75,10 @@ public class Rock extends WorldBody {
 		return vertices;
 	}
 
-	public void getGraphics (GraphicsData g) {
+	public void getGraphics (GraphicsData g, Vector2 pos) {
+		if (Vector2.dst(pos.x, pos.y, body.getPosition().x, body.getPosition().y) > Units.MAX_VIEW_DIST) { 
+			return;
+		}
 		PolygonData poly = new PolygonData(body.getPosition().x, body.getPosition().y, body.getAngle(), vertices);
 		poly.setColor(0.8f, 0.8f, 0.8f, 1);
 		g.rocks.add(poly);

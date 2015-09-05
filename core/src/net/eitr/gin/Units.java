@@ -5,7 +5,8 @@ public class Units {
 	public static final int WORLD_WIDTH = 1000;
 	public static final int WORLD_HEIGHT = 1000;
 
-	public static final int VIEW_SIZE = 8;
+	public static final int VIEW_SIZE = 8*16;
+	public static final int MAX_VIEW_DIST = VIEW_SIZE;
 	
 	public static final int MAX_SHIP_PARTS = 30;
 
@@ -17,4 +18,7 @@ public class Units {
 
 	public static final int TCP_PORT = 54555;
 	public static final int UDP_PORT = 54777;
+
+	public static final int NETWORK_OBJECT_SIZE = 2048;
+	public static final int NETWORK_BUFFER_SIZE = NETWORK_OBJECT_SIZE * 16;
 }

@@ -75,25 +75,26 @@ public class WorldManager {
 	}
 	
 	public void getGraphics (int playerId, GraphicsData g) {
+		Ship player = players.get(playerId);
+		
 		for(Rock rock : rocks) {
-			rock.getGraphics(g);
+			rock.getGraphics(g, player.getPosition());
 		}
 		for(Ship ship : players.values()) {
-			ship.getGraphics(g);
+			ship.getGraphics(g, player.getPosition());
 		}
 		Iterator<Projectile> ps = projectiles.iterator();
 		while (ps.hasNext()) {
 			Projectile p = ps.next();
-			p.getGraphics(g);
+			p.getGraphics(g, player.getPosition());
 		}
 		
-		Ship ship = players.get(playerId);
-		ship.debug("bullets", projectiles.size);
-		Iterator<String> keys = ship.debugMap.keys();
-		String [] labels = new String[ship.debugMap.size];
+		player.debug("bullets", projectiles.size);
+		Iterator<String> keys = player.debugMap.keys();
+		String [] labels = new String[player.debugMap.size];
 		int i = 0;
 		while (keys.hasNext()) {
-			labels[i++] = ship.debugMap.get(keys.next());
+			labels[i++] = player.debugMap.get(keys.next());
 		}
 		g.debug = labels;
 	}

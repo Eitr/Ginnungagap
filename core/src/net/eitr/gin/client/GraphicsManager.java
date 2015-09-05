@@ -55,11 +55,6 @@ public class GraphicsManager {
 		polygons.begin();
 		Array<PolygonData> rocks = new Array<PolygonData>(data.rocks);
 		for(PolygonData rock : rocks) {
-			if (rockTexture == null) {
-				System.out.println("TEXTURE");
-			} else if (rock.vertices == null) {
-				System.out.println("TEXTURE");
-			}
 			PolygonRegion region = new PolygonRegion(rockTexture, rock.vertices, Rock.getTriangles(rock.vertices));
 			PolygonSprite sprite = new PolygonSprite(region);
 			sprite.setColor(rock.color);
@@ -71,7 +66,8 @@ public class GraphicsManager {
 		polygons.end();
 
 		shapes.begin(ShapeType.Filled);
-		for (ShipData ship : data.ships) {
+		Array<ShipData> ships = new Array<ShipData>(data.ships);
+		for (ShipData ship : ships) {
 			shapes.identity();
 			shapes.translate(ship.x, ship.y, 0);
 			shapes.rotate(0, 0, 1, ship.angle);
@@ -91,7 +87,8 @@ public class GraphicsManager {
 			shapes.translate(-ship.x, -ship.y, 0);
 	
 		}
-		for (ShapeData projectile : data.shapes) {
+		Array<ShapeData> projectiles = new Array<ShapeData>(data.shapes);
+		for (ShapeData projectile : projectiles) {
 			shapes.setColor(projectile.color);
 			if (projectile instanceof RectData) {
 				shapes.rect(projectile.x,projectile.y,((RectData)projectile).width,((RectData)projectile).height);

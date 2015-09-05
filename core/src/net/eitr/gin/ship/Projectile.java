@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
+import net.eitr.gin.Units;
 import net.eitr.gin.Units.WorldBodyType;
 import net.eitr.gin.network.GraphicsData;
 import net.eitr.gin.network.RectData;
@@ -59,7 +60,10 @@ public class Projectile extends WorldBody {
 		}
 	}
 
-	public void getGraphics (GraphicsData g) {
+	public void getGraphics (GraphicsData g, Vector2 pos) {
+		if (Vector2.dst(pos.x, pos.y, body.getPosition().x, body.getPosition().y) > Units.MAX_VIEW_DIST) { 
+			return;
+		}
 		RectData rect = new RectData(body.getPosition().x-size/2, body.getPosition().y-size/2, size, size);
 		rect.setColor(1f, 0f, 0f, 1f);
 		g.shapes.add(rect);

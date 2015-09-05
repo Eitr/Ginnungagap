@@ -186,7 +186,10 @@ public class Ship extends WorldBody {
 		debug("mass",(int)body.getMass());
 	}
 	
-	public void getGraphics (GraphicsData g) {
+	public void getGraphics (GraphicsData g, Vector2 pos) {
+		if (Vector2.dst(pos.x, pos.y, body.getPosition().x, body.getPosition().y) > Units.MAX_VIEW_DIST) { 
+			return;
+		}
 		ShipData shipData = new ShipData(body.getPosition().x, body.getPosition().y, body.getAngle());
 		shipBuilder.getGraphics(shipData);
 		for (ShipPart part : parts.values()) {

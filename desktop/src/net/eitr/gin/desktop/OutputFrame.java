@@ -6,9 +6,6 @@ import java.io.PrintStream;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
-import net.eitr.gin.server.StreamCapturer;
-
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;

@@ -4,7 +4,9 @@ import java.io.IOException;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.utils.IntMap;
+import com.esotericsoftware.kryo.KryoException;
 import com.esotericsoftware.kryonet.*;
+import com.esotericsoftware.minlog.Log;
 
 import net.eitr.gin.Units;
 import net.eitr.gin.network.*;
@@ -24,7 +26,7 @@ public class ServerMain implements ApplicationListener {
 	public void create() {
 		data = new GraphicsData();
 		try {
-			server = new Server(2048000,1024000);
+			server = new Server(Units.NETWORK_BUFFER_SIZE, Units.NETWORK_OBJECT_SIZE);
 			Network.registerClasses(server.getKryo());
 			server.start();
 			server.bind(Units.TCP_PORT, Units.UDP_PORT);
@@ -62,7 +64,12 @@ public class ServerMain implements ApplicationListener {
 			data.reset();
 			world.getGraphics(id, data);
 			data.setPlayerPosition(world.getPlayerPosition(id));
-			server.sendToTCP(id,data);
+			try {
+				server.sendToTCP(id,data);
+//				server.sendToUDP(id,data); // jittery
+			} catch (KryoException e) {
+				Log.error("Network exception: "+e.getLocalizedMessage());
+			}
 		}
 		world.simulate();
 	}
