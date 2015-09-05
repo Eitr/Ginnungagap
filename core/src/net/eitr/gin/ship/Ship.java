@@ -67,8 +67,8 @@ public class Ship extends WorldBody {
 	}
 	
 	public void resetPosition () {
-		body.setTransform(0, 0, 0);
 		body.setLinearVelocity(0, 0);
+		body.setTransform(0, 0, 0);
 	}
 
 	public int getNewPartId () {
@@ -123,6 +123,8 @@ public class Ship extends WorldBody {
 				}
 				shipBuilder.buildNewPart(); break;
 			}
+			
+			//TODO shipbuilder scale
 //			float scale = 0.2f;
 //			if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
 //				ship.shipBuilder.width -= scale;

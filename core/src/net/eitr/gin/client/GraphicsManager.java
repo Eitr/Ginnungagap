@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.utils.Array;
 
 import net.eitr.gin.network.*;
 import net.eitr.gin.server.Rock;
@@ -38,9 +37,6 @@ public class GraphicsManager {
 	}
 	
 	public void setGraphicsData (GraphicsData d) {
-		data.rocks.clear();
-		data.shapes.clear();
-		data.ships.clear();
 		data = d;
 	}
 	
@@ -53,8 +49,7 @@ public class GraphicsManager {
 		//sprites.end();
 
 		polygons.begin();
-		Array<PolygonData> rocks = new Array<PolygonData>(data.rocks);
-		for(PolygonData rock : rocks) {
+		for(PolygonData rock : data.rocks) {
 			PolygonRegion region = new PolygonRegion(rockTexture, rock.vertices, Rock.getTriangles(rock.vertices));
 			PolygonSprite sprite = new PolygonSprite(region);
 			sprite.setColor(rock.color);
@@ -66,8 +61,7 @@ public class GraphicsManager {
 		polygons.end();
 
 		shapes.begin(ShapeType.Filled);
-		Array<ShipData> ships = new Array<ShipData>(data.ships);
-		for (ShipData ship : ships) {
+		for (ShipData ship : data.ships) {
 			shapes.identity();
 			shapes.translate(ship.x, ship.y, 0);
 			shapes.rotate(0, 0, 1, ship.angle);
@@ -87,8 +81,7 @@ public class GraphicsManager {
 			shapes.translate(-ship.x, -ship.y, 0);
 	
 		}
-		Array<ShapeData> projectiles = new Array<ShapeData>(data.shapes);
-		for (ShapeData projectile : projectiles) {
+		for (ShapeData projectile : data.shapes) {
 			shapes.setColor(projectile.color);
 			if (projectile instanceof RectData) {
 				shapes.rect(projectile.x,projectile.y,((RectData)projectile).width,((RectData)projectile).height);
