@@ -8,11 +8,13 @@ public class GraphicsData {
 	public Array<PolygonData> rocks;
 	public Array<ShapeData> shapes;
 	public float x,y;
+	public String[] debug;
 	
 	public GraphicsData () {
 		ships = new Array<ShipData>();
 		rocks = new Array<PolygonData>();
 		shapes = new Array<ShapeData>();
+		debug = new String[0];
 	}
 	
 	public void setPlayerPosition (Vector2 pos) {

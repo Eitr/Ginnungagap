@@ -13,8 +13,8 @@ public class ServerLauncher {
 		config.resizable = true;
 		config.useGL30 = false;
 		config.vSyncEnabled = true;
-		config.width = 1600;
-		config.height = 900;
+		config.width = 1366;
+		config.height = 768;
 //		config.title = Main.version; //TODO
 
 		new OutputFrame("Server Output");

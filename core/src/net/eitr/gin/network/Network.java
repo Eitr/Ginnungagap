@@ -18,5 +18,6 @@ public class Network {
 		kryo.register(float[].class);
 		kryo.register(Color.class);
 		kryo.register(InputData.class);
+		kryo.register(String[].class);
 	}
 }

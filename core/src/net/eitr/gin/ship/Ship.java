@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.ObjectMap;
 
 import net.eitr.gin.*;
 import net.eitr.gin.Units.*;
@@ -20,6 +21,8 @@ public class Ship extends WorldBody {
 	public Body body;
 	IntMap<ShipPart> parts;
 	public ShipBuilder shipBuilder;
+	
+	public ObjectMap<String,String> debugMap = new ObjectMap<String,String>();
 
 	public Ship (Body b) {
 		super(WorldBodyType.SHIP);
@@ -175,6 +178,12 @@ public class Ship extends WorldBody {
 		for (ShipPart part : parts.values()) {
 			part.update(shooting);
 		}
+
+		debug("mouse","("+(int)shipBuilder.mouse.x+","+(int)shipBuilder.mouse.y+")");
+		debug("collision",intersects(shipBuilder.newPart));
+		debug("part type",shipBuilder.buildType);
+		debug("parts",parts.size);
+		debug("mass",(int)body.getMass());
 	}
 	
 	public void getGraphics (GraphicsData g) {
@@ -185,4 +194,9 @@ public class Ship extends WorldBody {
 		}
 		g.ships.add(shipData);
 	}
+
+	public void debug (String s, Object value) {
+		debugMap.put(s, s+": "+value.toString());
+	}
+	
 }

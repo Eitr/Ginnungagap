@@ -6,6 +6,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.utils.IntMap;
 import com.esotericsoftware.kryonet.*;
 
+import net.eitr.gin.Units;
 import net.eitr.gin.network.*;
 
 public class ServerMain implements ApplicationListener {
@@ -15,6 +16,10 @@ public class ServerMain implements ApplicationListener {
 	private Server server;
 	private GraphicsData data;
 
+	public ServerMain () {
+		super();
+	}
+	
 	@Override
 	public void create() {
 		data = new GraphicsData();
@@ -22,7 +27,7 @@ public class ServerMain implements ApplicationListener {
 			server = new Server(2048000,1024000);
 			Network.registerClasses(server.getKryo());
 			server.start();
-			server.bind(54555, 54777);
+			server.bind(Units.TCP_PORT, Units.UDP_PORT);
 			
 			// PLAYER INPUT
 			server.addListener(new Listener() {
@@ -51,11 +56,11 @@ public class ServerMain implements ApplicationListener {
 
 	@Override
 	public void render () {
-		data.reset();
-		world.getGraphics(data);
 		IntMap.Keys keys = world.players.keys();
 		while (keys.hasNext) {
 			int id = keys.next();
+			data.reset();
+			world.getGraphics(id, data);
 			data.setPlayerPosition(world.getPlayerPosition(id));
 			server.sendToTCP(id,data);
 		}

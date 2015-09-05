@@ -14,4 +14,7 @@ public class Units {
 	public static enum DrawShapeType {POLYGON,CIRCLE,RECT};
 	public static enum ShipPartType {WEAPON,HULL};
 	public static enum WorldBodyType {EDGE,SHIP,ROCK,PROJECTILE};
+
+	public static final int TCP_PORT = 54555;
+	public static final int UDP_PORT = 54777;
 }

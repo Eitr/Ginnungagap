@@ -74,7 +74,7 @@ public class WorldManager {
 		debugRenderer.render(world, cam.combined);
 	}
 	
-	public void getGraphics (GraphicsData g) {
+	public void getGraphics (int playerId, GraphicsData g) {
 		for(Rock rock : rocks) {
 			rock.getGraphics(g);
 		}
@@ -86,6 +86,16 @@ public class WorldManager {
 			Projectile p = ps.next();
 			p.getGraphics(g);
 		}
+		
+		Ship ship = players.get(playerId);
+		ship.debug("bullets", projectiles.size);
+		Iterator<String> keys = ship.debugMap.keys();
+		String [] labels = new String[ship.debugMap.size];
+		int i = 0;
+		while (keys.hasNext()) {
+			labels[i++] = ship.debugMap.get(keys.next());
+		}
+		g.debug = labels;
 	}
 
 	public void simulate () {
@@ -116,7 +126,7 @@ public class WorldManager {
 	public Vector2 getPlayerPosition (int id) {
 		return players.get(id).getPosition();
 	}
-
+		
 	public void createPlayer (int id) {
 		BodyDef shipDef = new BodyDef();
 		shipDef.type = BodyType.DynamicBody;

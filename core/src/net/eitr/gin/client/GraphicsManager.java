@@ -1,5 +1,6 @@
 package net.eitr.gin.client;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -102,16 +103,13 @@ public class GraphicsManager {
 		}
 		shapes.end();
 		
-		//TODO pass in the debug gui
 		//TODO latency
-//		ServerMain.gui.debug("builder","("+(int)newPart.pos.x+","+(int)newPart.pos.y+")");
-//		ServerMain.gui.debug("mouse","("+(int)mouse.x+","+(int)mouse.y+")");
-//		ServerMain.gui.debug("collision",ship.intersects(newPart));
-//		ServerMain.gui.debug("part type",buildType);
-//		ServerMain.gui.debug("parts",parts.size);
-//		ServerMain.gui.debug("mass",body.getMass());
-//		ServerMain.gui.debug("bullets", projectiles.size);
-//		ServerMain.gui.debug("zoom", (int)(camera.zoom*100)/100f);
+		GameScreen.gui.debug("FPS", Gdx.graphics.getFramesPerSecond());
+		GameScreen.gui.debug("zoom", (int)(camera.zoom*100)/100f);
+		
+		for (String s : data.debug) {
+			GameScreen.gui.debug(s.substring(0,s.indexOf(":")), s.substring(s.indexOf(":")+2));
+		}
 	}
 
 
