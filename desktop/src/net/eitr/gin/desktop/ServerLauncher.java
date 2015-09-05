@@ -2,7 +2,7 @@ package net.eitr.gin.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import net.eitr.gin.*;
+
 import net.eitr.gin.server.ServerMain;
 
 public class ServerLauncher {
@@ -15,7 +15,9 @@ public class ServerLauncher {
 		config.vSyncEnabled = true;
 		config.width = 1600;
 		config.height = 900;
-//		config.title = Main.version;
+//		config.title = Main.version; //TODO
+
+		new OutputFrame("Server Output");
 		
 		new LwjglApplication(new ServerMain(), config);
 	}

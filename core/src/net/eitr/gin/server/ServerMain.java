@@ -73,6 +73,9 @@ public class ServerMain implements ApplicationListener {
 
 	@Override
 	public void dispose() {
+		for (Connection client : server.getConnections()) {
+			client.close();
+		}
 		server.stop();
 	}
 
