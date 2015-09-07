@@ -48,7 +48,7 @@ public class GameScreen implements Screen {
 			client = new Client(Units.NETWORK_BUFFER_SIZE, Units.NETWORK_OBJECT_SIZE);
 			Network.registerClasses(client.getKryo());
 		    client.start();
-		    client.connect(5000, ip, Units.TCP_PORT, Units.UDP_PORT);
+		    client.connect(5000, ip, Units.TCP_PORT);//, Units.UDP_PORT);
 		    
 		    client.addListener(new Listener() {
 		        public void received (Connection connection, Object object) {
@@ -76,7 +76,7 @@ public class GameScreen implements Screen {
 		client.sendTCP(input.getInputData());
 
 		graphics.render(camera);
-//		gui.update();
+		gui.update();
 	}
 
 	@Override

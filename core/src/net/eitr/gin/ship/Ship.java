@@ -16,11 +16,12 @@ import net.eitr.gin.server.WorldBody;
 
 public class Ship extends WorldBody {
 
-	float width, height, thrust, rotationSpeed;
-	private boolean thrusting, shooting, turningLeft, turningRight;
-	public Body body;
-	IntMap<ShipPart> parts;
-	public ShipBuilder shipBuilder;
+	public boolean connectionReady;
+	protected float width, height, thrust, rotationSpeed;
+	protected boolean thrusting, shooting, turningLeft, turningRight;
+	protected Body body;
+	protected IntMap<ShipPart> parts;
+	protected ShipBuilder shipBuilder;
 	
 	public ObjectMap<String,String> debugMap = new ObjectMap<String,String>();
 
@@ -33,6 +34,7 @@ public class Ship extends WorldBody {
 		thrust = 20f;
 		rotationSpeed = 10.0f*32f;
 		thrusting = false;
+		connectionReady = true;
 
 		body.setUserData(this);
 		parts = new IntMap<ShipPart>();
@@ -89,6 +91,10 @@ public class Ship extends WorldBody {
 
 	public float getY () {
 		return body.getPosition().y;
+	}
+	
+	public Body getBody () {
+		return body;
 	}
 	
 	public boolean intersects (ShipPart part) {
@@ -188,8 +194,8 @@ public class Ship extends WorldBody {
 		debug("mass",(int)body.getMass());
 	}
 	
-	public void getGraphics (GraphicsData g, Vector2 pos) {
-		if (Vector2.dst(pos.x, pos.y, body.getPosition().x, body.getPosition().y) > Units.MAX_VIEW_DIST) { 
+	public void getGraphics (GraphicsData g) {
+		if (Vector2.dst(g.x, g.y, body.getPosition().x, body.getPosition().y) > Units.MAX_VIEW_DIST) { 
 			return;
 		}
 		ShipData shipData = new ShipData(body.getPosition().x, body.getPosition().y, body.getAngle());

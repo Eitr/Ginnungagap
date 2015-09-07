@@ -43,7 +43,7 @@ public class PartWeapon extends ShipPart {
 		float angle = MathUtils.atan2(y, x);
 		bulletDef.position.set(MathUtils.cos(angle+ship.getAngle())*dist+ship.getPosition().x,MathUtils.sin(angle+ship.getAngle())*dist+ship.getPosition().y);
 		
-		ServerMain.world.projectiles.add(new Projectile(WorldManager.world.createBody(bulletDef), ship.getLinearVelocity(), ship.getAngle()));
+		ServerMain.world.projectiles.add(new Projectile(WorldManager.getNewWorldBody(bulletDef), ship.getLinearVelocity(), ship.getAngle()));
 	}
 	
 }

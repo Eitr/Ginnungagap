@@ -3,10 +3,7 @@ package net.eitr.gin.server;
 import java.io.IOException;
 
 import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.utils.IntMap;
-import com.esotericsoftware.kryo.KryoException;
 import com.esotericsoftware.kryonet.*;
-import com.esotericsoftware.minlog.Log;
 
 import net.eitr.gin.Units;
 import net.eitr.gin.network.*;
@@ -14,9 +11,9 @@ import net.eitr.gin.network.*;
 public class ServerMain implements ApplicationListener {
 
 	public static WorldManager world;
+	private static PlayerManager players;
 
 	private Server server;
-	private GraphicsData data;
 
 	public ServerMain () {
 		super();
@@ -24,29 +21,32 @@ public class ServerMain implements ApplicationListener {
 	
 	@Override
 	public void create() {
-		data = new GraphicsData();
 		try {
 			server = new Server(Units.NETWORK_BUFFER_SIZE, Units.NETWORK_OBJECT_SIZE);
 			Network.registerClasses(server.getKryo());
 			server.start();
-			server.bind(Units.TCP_PORT, Units.UDP_PORT);
+			server.bind(Units.TCP_PORT);//, Units.UDP_PORT);
 			
 			// PLAYER INPUT
 			server.addListener(new Listener() {
-				public void connected (Connection client) {
-					world.createPlayer(client.getID());
+				public void connected (Connection connection) {
+					players.createPlayer(connection.getID());
 				}
 				
-				public void disconnected (Connection client) {
-					world.removePlayer(client.getID());
+				public void disconnected (Connection connection) {
+					players.removePlayer(connection.getID());
 				}
 				
-				public void received (Connection client, Object object) {
-					int id = client.getID();
+				public void received (Connection connection, Object object) {
+					int id = connection.getID();
 					if (object instanceof InputData) {
 						InputData input = (InputData)object;
-						world.doPlayerInput(id,input);
+						players.doPlayerInput(id,input);
 					}
+				}
+				
+				public void idle (Connection connection) {
+					players.setConnectionReady(connection.getID(),true);
 				}
 			});
 		} catch (IOException e) {
@@ -54,24 +54,25 @@ public class ServerMain implements ApplicationListener {
 		}
 
 		world = new WorldManager();
+		players = new PlayerManager();
 	}
 
 	@Override
 	public void render () {
-		IntMap.Keys keys = world.players.keys();
-		while (keys.hasNext) {
-			int id = keys.next();
-			data.reset();
-			world.getGraphics(id, data);
-			data.setPlayerPosition(world.getPlayerPosition(id));
-			try {
+		GraphicsData data = new GraphicsData();
+		int[] keys = players.getConnectedPlayers();
+		for (int id : keys) {
+			if (players.isConnectionReady(id)) {
+				data.reset();
+				data.setPlayerPosition(players.getPlayerPosition(id));
+				players.getGraphics(id,data);
+				world.getGraphics(data);
 				server.sendToTCP(id,data);
-//				server.sendToUDP(id,data); // jittery
-			} catch (KryoException e) {
-				Log.error("Network exception: "+e.getLocalizedMessage());
+				players.setConnectionReady(id, false);
 			}
 		}
 		world.simulate();
+		players.simulate();
 	}
 
 	@Override

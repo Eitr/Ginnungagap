@@ -75,8 +75,8 @@ public class Rock extends WorldBody {
 		return vertices;
 	}
 
-	public void getGraphics (GraphicsData g, Vector2 pos) {
-		if (Vector2.dst(pos.x, pos.y, body.getPosition().x, body.getPosition().y) > Units.MAX_VIEW_DIST) { 
+	public void getGraphics (GraphicsData g) {
+		if (Vector2.dst(g.x, g.y, body.getPosition().x, body.getPosition().y) > Units.MAX_VIEW_DIST) { 
 			return;
 		}
 		PolygonData poly = new PolygonData(body.getPosition().x, body.getPosition().y, body.getAngle(), vertices);

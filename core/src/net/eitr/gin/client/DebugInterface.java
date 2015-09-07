@@ -30,20 +30,25 @@ public class DebugInterface extends Stage {
 	
 	public void update () {
 		act(Gdx.graphics.getDeltaTime());
-		draw();
+		synchronized (map){
+			draw();
+		}
 	}
 	
 	public void debug (String s, Object value) {
 		if (s.equals("")) {
 			return;
 		}
-		if (map.containsKey(s)) {
-			map.get(s).setText(s+": "+value.toString());
-		} else {
-			Label label = new Label(s+": "+value.toString(), style);
-			label.setPosition(10, view.getWorldHeight()-gap*z++);
-			addActor(label);
-			map.put(s, label);
+		synchronized (map) {
+			if (map.containsKey(s)) {
+				map.get(s).setText(s+": "+value.toString());
+				
+			} else {
+				Label label = new Label(s+": "+value.toString(), style);
+				label.setPosition(10, view.getWorldHeight()-gap*z++);
+				addActor(label);
+				map.put(s, label);
+			}
 		}
 	}
 }

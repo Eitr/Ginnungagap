@@ -8,20 +8,17 @@ import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
 
 import net.eitr.gin.Units;
 import net.eitr.gin.Units.WorldBodyType;
 import net.eitr.gin.network.GraphicsData;
-import net.eitr.gin.network.InputData;
 import net.eitr.gin.ship.*;
 
 public class WorldManager {
 
-	public static World world;
+	protected static World world;
 
-	IntMap<Ship> players;
-	Array<Rock> rocks;
+	private Array<Rock> rocks;
 
 	float timeAccumulator = 0;
 	public Array<Projectile> projectiles;
@@ -69,45 +66,29 @@ public class WorldManager {
 	}
 
 
-	public void draw (OrthographicCamera cam) {
+	protected void draw (OrthographicCamera cam) {
 		debugRenderer.setDrawVelocities(true);
 		debugRenderer.render(world, cam.combined);
 	}
 	
-	public void getGraphics (int playerId, GraphicsData g) {
-		Ship player = players.get(playerId);
-		
+	protected void getGraphics (GraphicsData g) {
 		for(Rock rock : rocks) {
-			rock.getGraphics(g, player.getPosition());
-		}
-		for(Ship ship : players.values()) {
-			ship.getGraphics(g, player.getPosition());
+			rock.getGraphics(g);
 		}
 		Iterator<Projectile> ps = projectiles.iterator();
 		while (ps.hasNext()) {
 			Projectile p = ps.next();
-			p.getGraphics(g, player.getPosition());
+			p.getGraphics(g);
 		}
 		
-		player.debug("bullets", projectiles.size);
-		Iterator<String> keys = player.debugMap.keys();
-		String [] labels = new String[player.debugMap.size];
-		int i = 0;
-		while (keys.hasNext()) {
-			labels[i++] = player.debugMap.get(keys.next());
-		}
-		g.debug = labels;
 	}
 
-	public void simulate () {
+	protected void simulate () {
 		world.step(1/300f, 6, 2);
 		timeAccumulator += Gdx.graphics.getDeltaTime();
 		while (timeAccumulator >= Units.TIME_STEP) {
 			world.step(Units.TIME_STEP,6,2);
 			timeAccumulator -= Units.TIME_STEP;
-		}
-		for (Ship ship : players.values()) {
-			ship.update();
 		}
 		Iterator<Projectile> ps = projectiles.iterator();
 		while (ps.hasNext()) {
@@ -119,28 +100,7 @@ public class WorldManager {
 			}
 		}
 	}
-
-	public void doPlayerInput (int id, InputData input) {
-		players.get(id).handleInput(input);
-	}
 	
-	public Vector2 getPlayerPosition (int id) {
-		return players.get(id).getPosition();
-	}
-		
-	public void createPlayer (int id) {
-		BodyDef shipDef = new BodyDef();
-		shipDef.type = BodyType.DynamicBody;
-		shipDef.position.set(0,0);
-		//players.add(new Ship(world.createBody(shipDef)));
-		players.put(id, new Ship(world.createBody(shipDef)));
-	}
-	
-	public void removePlayer (int id) {
-		world.destroyBody(players.get(id).body);
-		players.remove(id);
-	}
-
 	private void createRocks () {
 		rocks = new Array<Rock>();
 		BodyDef rockDef = new BodyDef();
@@ -155,7 +115,6 @@ public class WorldManager {
 		world = new World(new Vector2(0,0), true);
 		debugRenderer = new Box2DDebugRenderer();
 		projectiles = new Array<Projectile>();
-		players = new IntMap<Ship>();
 	}
 
 	private void createWorldEdges () {
@@ -184,4 +143,7 @@ public class WorldManager {
 		edgeShape.dispose();
 	}
 
+	public static Body getNewWorldBody (BodyDef def) {
+		return world.createBody(def);
+	}
 }

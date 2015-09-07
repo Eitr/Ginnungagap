@@ -60,8 +60,8 @@ public class Projectile extends WorldBody {
 		}
 	}
 
-	public void getGraphics (GraphicsData g, Vector2 pos) {
-		if (Vector2.dst(pos.x, pos.y, body.getPosition().x, body.getPosition().y) > Units.MAX_VIEW_DIST) { 
+	public void getGraphics (GraphicsData g) {
+		if (Vector2.dst(g.x, g.y, body.getPosition().x, body.getPosition().y) > Units.MAX_VIEW_DIST) { 
 			return;
 		}
 		RectData rect = new RectData(body.getPosition().x-size/2, body.getPosition().y-size/2, size, size);
