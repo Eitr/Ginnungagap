@@ -93,7 +93,6 @@ public class GraphicsManager {
 		}
 		shapes.end();
 		
-		//TODO latency
 		GameScreen.gui.debug("FPS", Gdx.graphics.getFramesPerSecond());
 		GameScreen.gui.debug("zoom", (int)(camera.zoom*100)/100f);
 		

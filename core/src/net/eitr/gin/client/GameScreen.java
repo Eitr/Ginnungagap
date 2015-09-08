@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.esotericsoftware.kryonet.*;
@@ -69,14 +70,27 @@ public class GameScreen implements Screen {
 		Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
-		input.handleCameraInput();
-		camera.position.set(graphics.data.x, graphics.data.y, 0);
-		camera.update();
+		input.handleInput();
+		cameraControl();
 		
 		client.sendTCP(input.getInputData());
 
 		graphics.render(camera);
 		gui.update();
+	}
+	
+	private void cameraControl () {
+		camera.position.set(graphics.data.x, graphics.data.y, 0);
+		// Sets min/max for zoom
+		camera.zoom = MathUtils.clamp(camera.zoom, 0.5f, 3f);
+
+		// Keep the camera inside the boundaries of the map
+		float effectiveViewportWidth = camera.viewportWidth * camera.zoom;
+		float effectiveViewportHeight = camera.viewportHeight * camera.zoom;
+		camera.position.x = MathUtils.clamp(camera.position.x, effectiveViewportWidth / 2f - Units.WORLD_WIDTH/2F, Units.WORLD_WIDTH/2f - effectiveViewportWidth / 2f);
+		camera.position.y = MathUtils.clamp(camera.position.y, effectiveViewportHeight / 2f - Units.WORLD_HEIGHT/2F, Units.WORLD_HEIGHT/2f - effectiveViewportHeight / 2f);
+
+		camera.update();
 	}
 
 	@Override

@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Array;
 
-import net.eitr.gin.Units;
 import net.eitr.gin.network.InputData;
 
 public class InputHandler implements InputProcessor {
@@ -51,27 +50,13 @@ public class InputHandler implements InputProcessor {
 		return data;
 	}
 
-
-	public void handleCameraInput () {
+	public void handleInput () {
 		if (Gdx.input.isKeyPressed(Input.Keys.EQUALS)) {
 			camera.zoom -= 0.02;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.MINUS)) {
 			camera.zoom += 0.02;
 		}
-
-		// Sets min/max for zoom
-		camera.zoom = MathUtils.clamp(camera.zoom, 0.5f, 3f);
-
-		// Keep the camera inside the boundaries of the map
-		float effectiveViewportWidth = camera.viewportWidth * camera.zoom;
-		float effectiveViewportHeight = camera.viewportHeight * camera.zoom;
-		camera.position.x = MathUtils.clamp(camera.position.x, effectiveViewportWidth / 2f - Units.WORLD_WIDTH/2F, Units.WORLD_WIDTH/2f - effectiveViewportWidth / 2f);
-		camera.position.y = MathUtils.clamp(camera.position.y, effectiveViewportHeight / 2f - Units.WORLD_HEIGHT/2F, Units.WORLD_HEIGHT/2f - effectiveViewportHeight / 2f);
-	}
-	
-	public void handleInput () {
-		
 	}
 
 

@@ -2,8 +2,8 @@ package net.eitr.gin;
 
 public class Units {
 
-	public static final int WORLD_WIDTH = 1000;
-	public static final int WORLD_HEIGHT = 1000;
+	public static final int WORLD_WIDTH = 500;
+	public static final int WORLD_HEIGHT = 500;
 
 	public static final int VIEW_SIZE = 8*16;
 	public static final int MAX_VIEW_DIST = VIEW_SIZE;
