@@ -1,21 +1,29 @@
 package net.eitr.gin.ship;
 
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.ObjectMap;
 
 import net.eitr.gin.*;
 import net.eitr.gin.Units.*;
+import net.eitr.gin.network.GraphicsData;
+import net.eitr.gin.network.InputData;
+import net.eitr.gin.network.ShipData;
+import net.eitr.gin.server.WorldBody;
 
 public class Ship extends WorldBody {
 
-	float width, height, thrust, rotationSpeed;
-	public boolean thrusting, shooting;
-	public Body body;
-	IntMap<ShipPart> parts;
-	public ShipBuilder shipBuilder;
+	public boolean connectionReady;
+	protected float width, height, thrust, rotationSpeed;
+	protected boolean thrusting, shooting, turningLeft, turningRight;
+	protected Body body;
+	protected IntMap<ShipPart> parts;
+	protected ShipBuilder shipBuilder;
+	
+	public ObjectMap<String,String> debugMap = new ObjectMap<String,String>();
 
 	public Ship (Body b) {
 		super(WorldBodyType.SHIP);
@@ -26,6 +34,7 @@ public class Ship extends WorldBody {
 		thrust = 20f;
 		rotationSpeed = 10.0f*32f;
 		thrusting = false;
+		connectionReady = true;
 
 		body.setUserData(this);
 		parts = new IntMap<ShipPart>();
@@ -43,15 +52,15 @@ public class Ship extends WorldBody {
 		parts.get(id).damage(damage);
 	}
 
-	public void rotateLeft () {
+	private void rotateLeft () {
 		body.setAngularVelocity(rotationSpeed/body.getMass());
 	}
 
-	public void rotateRight () {
+	private void rotateRight () {
 		body.setAngularVelocity(-rotationSpeed/body.getMass());
 	}
 
-	public void thrust () {
+	private void thrust () {
 		float xforce = (float)(Math.cos(body.getAngle())*thrust);
 		float yforce = (float)(Math.sin(body.getAngle())*thrust);
 		//    	body.applyForceToCenter(xforce,yforce,true);
@@ -60,37 +69,10 @@ public class Ship extends WorldBody {
 	}
 	
 	public void resetPosition () {
-		body.setTransform(0, 0, 0);
 		body.setLinearVelocity(0, 0);
+		body.setTransform(0, 0, 0);
 	}
 
-	public void draw (ShapeRenderer g) {
-		g.identity();
-		//TODO: translate vs set position (parts are local position based)
-		//TODO: rotation slightly adjusts everything else in the world
-		g.translate(body.getPosition().x, body.getPosition().y, 0);
-		g.rotate(0, 0, 1, (float)(body.getAngle()/Math.PI*180f));
-		shipBuilder.draw(g);
-		g.setColor(1, 1, 0, 1);
-		for (ShipPart p : parts.values()) {
-			p.draw(g);
-			p.update(shooting);
-		}
-		if (thrusting) {
-			g.setColor(1, 0, 0, 1);
-			g.rect(-MathUtils.random(0,width/2)-width/2,-MathUtils.random(-height/2,height/2),0.5f,0.5f);
-			g.rect(-MathUtils.random(0,width/2)-width/2,-MathUtils.random(-height/2,height/2),0.5f,0.5f);
-			g.rect(-MathUtils.random(0,width/2)-width/2,-MathUtils.random(-height/2,height/2),0.5f,0.5f);
-			thrusting = false;
-		}
-		g.rotate(0, 0, 1, -(float)(body.getAngle()/Math.PI*180f));
-		g.translate(-body.getPosition().x, -body.getPosition().y, 0);
-
-		
-		Main.gui.debug("parts",parts.size);
-		Main.gui.debug("mass",body.getMass());
-	}
-	
 	public int getNewPartId () {
 		int id;
 		do {
@@ -111,6 +93,10 @@ public class Ship extends WorldBody {
 		return body.getPosition().y;
 	}
 	
+	public Body getBody () {
+		return body;
+	}
+	
 	public boolean intersects (ShipPart part) {
 		for (ShipPart p : parts.values()) {
 			if (p.intersects(part)) {
@@ -119,4 +105,109 @@ public class Ship extends WorldBody {
 		}
 		return false;
 	}
+	
+	public void handleInput (InputData input) {
+		shipBuilder.mouse = new Vector2(input.mx, input.my);
+		
+		for (int key : input.keysDown) {
+			switch(key) {
+			case Input.Keys.W: thrusting = true; break;
+			case Input.Keys.A: turningLeft = true; break;
+			case Input.Keys.D: turningRight = true; break;
+			case Input.Keys.R: resetPosition(); break;
+			case Input.Keys.B: shipBuilder.isBuilding = !shipBuilder.isBuilding;
+				shipBuilder.buildNewPart(); break;
+			case Input.Keys.NUM_1: shipBuilder.buildType = ShipPartType.HULL; 
+				shipBuilder.buildNewPart(); break;
+			case Input.Keys.NUM_2: shipBuilder.buildType = ShipPartType.WEAPON; 
+				shipBuilder.buildNewPart(); break;
+			case Input.Keys.S: 
+				switch(shipBuilder.shape) {
+				case RECT: shipBuilder.shape = DrawShapeType.CIRCLE; break;
+				case CIRCLE: shipBuilder.shape = DrawShapeType.RECT; break;
+				case POLYGON: break;
+				}
+				shipBuilder.buildNewPart(); break;
+			}
+			
+			//TODO shipbuilder scale
+//			float scale = 0.2f;
+//			if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+//				ship.shipBuilder.width -= scale;
+//				ship.shipBuilder.buildNewPart();
+//			}
+//			if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+//				ship.shipBuilder.width += scale;
+//				ship.shipBuilder.buildNewPart();
+//			}
+//			if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+//				ship.shipBuilder.height += scale;
+//				ship.shipBuilder.buildNewPart();
+//			}
+//			if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+//				ship.shipBuilder.height -= scale;
+//				ship.shipBuilder.buildNewPart();
+//			}
+		}
+		
+		for (int key : input.keysUp) {
+			switch(key) {
+			case Input.Keys.W: thrusting = false; break;
+			case Input.Keys.A: turningLeft = false; break;
+			case Input.Keys.D: turningRight = false; break;
+			}
+		}
+		
+		if (input.mouseDown) {
+			if (shipBuilder.isBuilding) {
+				shipBuilder.buildShip();
+			} else {
+				shooting = true;
+			}
+		}
+		if (input.mouseUp) {
+			shooting = false;
+		}
+	
+		if (thrusting) {
+			thrust();
+		}
+		
+		if (turningLeft) {
+			rotateLeft();
+		}
+		
+		if (turningRight) {
+			rotateRight();
+		}
+	}
+
+	public void update () {
+		for (ShipPart part : parts.values()) {
+			part.update(shooting);
+		}
+
+		debug("mouse","("+(int)shipBuilder.mouse.x+","+(int)shipBuilder.mouse.y+")");
+		debug("collision",intersects(shipBuilder.newPart));
+		debug("part type",shipBuilder.buildType);
+		debug("parts",parts.size);
+		debug("mass",(int)body.getMass());
+	}
+	
+	public void getGraphics (GraphicsData g) {
+		if (Vector2.dst(g.x, g.y, body.getPosition().x, body.getPosition().y) > Units.MAX_VIEW_DIST) { 
+			return;
+		}
+		ShipData shipData = new ShipData(body.getPosition().x, body.getPosition().y, body.getAngle());
+		shipBuilder.getGraphics(shipData);
+		for (ShipPart part : parts.values()) {
+			part.getGraphics(shipData);
+		}
+		g.ships.add(shipData);
+	}
+
+	public void debug (String s, Object value) {
+		debugMap.put(s, s+": "+value.toString());
+	}
+	
 }

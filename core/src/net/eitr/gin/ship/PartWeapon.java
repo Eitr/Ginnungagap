@@ -1,16 +1,15 @@
 package net.eitr.gin.ship;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
-import net.eitr.gin.Main;
-import net.eitr.gin.WorldManager;
 import net.eitr.gin.Units.*;
+import net.eitr.gin.server.ServerMain;
+import net.eitr.gin.server.WorldManager;
 
 public class PartWeapon extends ShipPart {
 
@@ -23,11 +22,7 @@ public class PartWeapon extends ShipPart {
 		timeAccumulator = 0;
 		fireRate = 5;
 	}
-	
-	public void draw (ShapeRenderer g) {
-		super.draw(g);
-	}
-	
+		
 	protected void update (boolean isShooting) {
 		timeAccumulator += Gdx.graphics.getDeltaTime();
 		while (timeAccumulator >= 1/fireRate && isShooting) {
@@ -48,7 +43,7 @@ public class PartWeapon extends ShipPart {
 		float angle = MathUtils.atan2(y, x);
 		bulletDef.position.set(MathUtils.cos(angle+ship.getAngle())*dist+ship.getPosition().x,MathUtils.sin(angle+ship.getAngle())*dist+ship.getPosition().y);
 		
-		Main.world.projectiles.add(new Projectile(WorldManager.world.createBody(bulletDef), ship.getLinearVelocity(), ship.getAngle()));
+		ServerMain.world.projectiles.add(new Projectile(WorldManager.getNewWorldBody(bulletDef), ship.getLinearVelocity(), ship.getAngle()));
 	}
-
+	
 }

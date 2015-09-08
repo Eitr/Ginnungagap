@@ -1,4 +1,4 @@
-package net.eitr.gin.server;
+package net.eitr.gin.desktop;
 
 import java.io.IOException;
 import java.io.OutputStream;

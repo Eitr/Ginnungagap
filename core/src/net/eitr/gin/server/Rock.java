@@ -1,19 +1,21 @@
-package net.eitr.gin;
+package net.eitr.gin.server;
 
-import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
+import net.eitr.gin.Units;
 import net.eitr.gin.Units.WorldBodyType;
+import net.eitr.gin.network.GraphicsData;
+import net.eitr.gin.network.PolygonData;
 
 public class Rock extends WorldBody {
 
 	private float size;
-	private PolygonSprite sprite;
 	private Body body;
+	float [] vertices;
 
 	public Rock (Body b) {
 		super(WorldBodyType.ROCK);
@@ -23,7 +25,7 @@ public class Rock extends WorldBody {
 		size = MathUtils.random(6, 24);
 		
 		//		float [] vertices = generateConcavePolygon(size);
-		float [] vertices = generateCircularPolygon(size);
+		vertices = generateCircularPolygon(size);
 
 		PolygonShape shape = new PolygonShape();
 		shape.set(vertices);
@@ -34,20 +36,9 @@ public class Rock extends WorldBody {
 		fDef.restitution = 0.1f;
 		body.createFixture(fDef);
 		shape.dispose();
-
-		Pixmap pix = new Pixmap(1, 1, Pixmap.Format.RGB888);
-		pix.setColor(0.8f, 0.8f, 0.8f, 1);
-		pix.fill();
-		PolygonRegion region = new PolygonRegion(new TextureRegion(new Texture(pix)),vertices, getTriangles(vertices));
-
-		//		EarClippingTriangulator ect = new EarClippingTriangulator();
-		//		PolygonRegion region = new PolygonRegion(new TextureRegion(new Texture(pix)),vertices,ect.computeTriangles(vertices).toArray());
-		
-		sprite = new PolygonSprite(region);
-		sprite.setOrigin(0, 0);
 	}
 
-	private short[] getTriangles (float[] v) {
+	public static short[] getTriangles (float[] v) {
 		short[] points = new short[(v.length-4)/2*3];
 		for (int i=0; i < points.length/3; i++) {
 			points[i*3] = 0;
@@ -55,12 +46,6 @@ public class Rock extends WorldBody {
 			points[i*3+2] = (short)((i+2));
 		}
 		return points;
-	}
-
-	public void draw (PolygonSpriteBatch g) {
-		sprite.setRotation(body.getAngle()*180f/MathUtils.PI);
-		sprite.setPosition(body.getPosition().x, body.getPosition().y);
-		sprite.draw(g);
 	}
 
 	@SuppressWarnings("unused")
@@ -77,7 +62,6 @@ public class Rock extends WorldBody {
 		return vertices;
 	}
 
-
 	private float[] generateCircularPolygon (float r) {
 		int p = 8; // total points around polygon (LIMIT 8 VERTICES PER POLYGON)
 		float [] vertices = new float[p*2];
@@ -91,4 +75,12 @@ public class Rock extends WorldBody {
 		return vertices;
 	}
 
+	public void getGraphics (GraphicsData g) {
+		if (Vector2.dst(g.x, g.y, body.getPosition().x, body.getPosition().y) > Units.MAX_VIEW_DIST) { 
+			return;
+		}
+		PolygonData poly = new PolygonData(body.getPosition().x, body.getPosition().y, body.getAngle(), vertices);
+		poly.setColor(0.8f, 0.8f, 0.8f, 1);
+		g.rocks.add(poly);
+	}
 }

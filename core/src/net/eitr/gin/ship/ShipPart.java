@@ -1,10 +1,13 @@
 package net.eitr.gin.ship;
 
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 
 import net.eitr.gin.Units.*;
+import net.eitr.gin.network.CircleData;
+import net.eitr.gin.network.RectData;
+import net.eitr.gin.network.ShapeData;
+import net.eitr.gin.network.ShipData;
 
 public class ShipPart {
 
@@ -38,22 +41,6 @@ public class ShipPart {
 		pos = p;
 		health = 100;
 	}
-
-	public void draw (ShapeRenderer g) {
-		g.setColor(0, health/100f, health/100f, 1);
-		switch(drawType) {
-		case CIRCLE: 
-			g.circle(pos.x, pos.y, radius);
-			break;
-		case RECT:
-			float w = width;
-			float h = height;
-			g.rect(pos.x-w/2f, pos.y-h/2f, w, h);
-			break;
-		case POLYGON:
-			break;
-		}
-	}
 	
 	protected void update (boolean isShooting) {}
 	
@@ -82,4 +69,14 @@ public class ShipPart {
 		return id;
 	}
 
+	public void getGraphics (ShipData shipData) {
+		ShapeData shape = null;
+		switch(drawType) {
+		case CIRCLE: shape = new CircleData(pos.x, pos.y, radius); break;
+		case RECT: shape = new RectData(pos.x-width/2f, pos.y-height/2f, width, height); break;
+		default: return;
+		}
+		shape.setColor(0, health/100f, health/100f, 1);
+		shipData.parts.add(shape);
+	}
 }

@@ -1,4 +1,4 @@
-package net.eitr.gin;
+package net.eitr.gin.client;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -11,7 +11,6 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class DebugInterface extends Stage {
 	
-//	Skin skin;
 	Label fpsLabel;
 	LabelStyle style;
 	Viewport view;
@@ -24,40 +23,32 @@ public class DebugInterface extends Stage {
 		super(v);
 		view = v;
 		
-//		skin = new Skin();
-		
-		// Store the default libgdx font under the name "default".
-//		skin.add("default", new BitmapFont());
-//		fpsLabel = new Label("fps",skin);
-		
 		style = new LabelStyle();
 		style.font = new BitmapFont();
 		style.fontColor = Color.WHITE;
-
-		fpsLabel = new Label("fps",style);
-		fpsLabel.setPosition(10, view.getWorldHeight()-gap*z++);
-		addActor(fpsLabel);
 	}
 	
-	public void update (WorldManager w) {
-		fpsLabel.setText("FPS: " + Gdx.graphics.getFramesPerSecond());
-		
+	public void update () {
 		act(Gdx.graphics.getDeltaTime());
-		draw();
-	}
-	
-	public void debug (String s, Object value) {
-		if (map.containsKey(s)) {
-			map.get(s).setText(s+": "+value.toString());
-		} else {
-			Label label = new Label(s+": "+value,style);
-			label.setPosition(10, view.getWorldHeight()-gap*z++);
-			addActor(label);
-			map.put(s, label);
+		synchronized (map){
+			draw();
 		}
 	}
 	
-//	public void dispose () {
-//		skin.dispose();
-//	}
+	public void debug (String s, Object value) {
+		if (s.equals("")) {
+			return;
+		}
+		synchronized (map) {
+			if (map.containsKey(s)) {
+				map.get(s).setText(s+": "+value.toString());
+				
+			} else {
+				Label label = new Label(s+": "+value.toString(), style);
+				label.setPosition(10, view.getWorldHeight()-gap*z++);
+				addActor(label);
+				map.put(s, label);
+			}
+		}
+	}
 }
