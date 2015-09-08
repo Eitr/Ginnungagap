@@ -65,7 +65,7 @@ public class Projectile extends WorldBody {
 			return;
 		}
 		RectData rect = new RectData(body.getPosition().x-size/2, body.getPosition().y-size/2, size, size);
-		rect.setColor(1f, 0f, 0f, 1f);
+		rect.setColor(1f, 0f, 1f, 1f);
 		g.shapes.add(rect);
 	}
 

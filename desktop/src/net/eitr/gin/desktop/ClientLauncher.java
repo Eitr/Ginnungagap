@@ -14,7 +14,7 @@ public class ClientLauncher {
 		config.fullscreen = false;
 		config.resizable = true;
 		config.useGL30 = false;
-		config.vSyncEnabled = true;
+		config.vSyncEnabled = false;
 		config.width = 1366;
 		config.height = 768;
 		

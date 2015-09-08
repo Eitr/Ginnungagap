@@ -11,6 +11,7 @@ import net.eitr.gin.*;
 import net.eitr.gin.Units.*;
 import net.eitr.gin.network.GraphicsData;
 import net.eitr.gin.network.InputData;
+import net.eitr.gin.network.RectData;
 import net.eitr.gin.network.ShipData;
 import net.eitr.gin.server.WorldBody;
 
@@ -70,7 +71,7 @@ public class Ship extends WorldBody {
 	
 	public void resetPosition () {
 		body.setLinearVelocity(0, 0);
-		body.setTransform(0, 0, 0);
+//		body.setTransform(0, 0, 0); // MUST synchronize with world.step
 	}
 
 	public int getNewPartId () {
@@ -110,6 +111,7 @@ public class Ship extends WorldBody {
 		shipBuilder.mouse = new Vector2(input.mx, input.my);
 		
 		for (int key : input.keysDown) {
+			float scale = 0.2f;
 			switch(key) {
 			case Input.Keys.W: thrusting = true; break;
 			case Input.Keys.A: turningLeft = true; break;
@@ -121,33 +123,26 @@ public class Ship extends WorldBody {
 				shipBuilder.buildNewPart(); break;
 			case Input.Keys.NUM_2: shipBuilder.buildType = ShipPartType.WEAPON; 
 				shipBuilder.buildNewPart(); break;
-			case Input.Keys.S: 
+			case Input.Keys.S:
 				switch(shipBuilder.shape) {
 				case RECT: shipBuilder.shape = DrawShapeType.CIRCLE; break;
 				case CIRCLE: shipBuilder.shape = DrawShapeType.RECT; break;
 				case POLYGON: break;
 				}
 				shipBuilder.buildNewPart(); break;
+			case Input.Keys.LEFT:
+				shipBuilder.width -= scale;
+				shipBuilder.buildNewPart(); break;
+			case Input.Keys.RIGHT:
+				shipBuilder.width += scale;
+				shipBuilder.buildNewPart(); break;
+			case Input.Keys.UP:
+				shipBuilder.height += scale;
+				shipBuilder.buildNewPart(); break;
+			case Input.Keys.DOWN:
+				shipBuilder.height -= scale;
+				shipBuilder.buildNewPart(); break;
 			}
-			
-			//TODO shipbuilder scale
-//			float scale = 0.2f;
-//			if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-//				ship.shipBuilder.width -= scale;
-//				ship.shipBuilder.buildNewPart();
-//			}
-//			if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-//				ship.shipBuilder.width += scale;
-//				ship.shipBuilder.buildNewPart();
-//			}
-//			if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-//				ship.shipBuilder.height += scale;
-//				ship.shipBuilder.buildNewPart();
-//			}
-//			if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-//				ship.shipBuilder.height -= scale;
-//				ship.shipBuilder.buildNewPart();
-//			}
 		}
 		
 		for (int key : input.keysUp) {
@@ -203,6 +198,14 @@ public class Ship extends WorldBody {
 		for (ShipPart part : parts.values()) {
 			part.getGraphics(shipData);
 		}
+
+		if (thrusting) {
+			for (int t = 0; t < 5; t++) {
+				RectData tr = new RectData(-MathUtils.random(0,width/3)-width/2,-MathUtils.random(-height/3,height/3),0.3f,0.3f);
+				tr.setColor(1f, .8f, 0f, 1f);
+				shipData.parts.add(tr);
+			}
+ 		}
 		g.ships.add(shipData);
 	}
 

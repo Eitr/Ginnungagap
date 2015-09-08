@@ -19,6 +19,6 @@ public class Units {
 	public static final int TCP_PORT = 54555;
 	public static final int UDP_PORT = 54777;
 
-	public static final int NETWORK_OBJECT_SIZE = 4096;
-	public static final int NETWORK_BUFFER_SIZE = NETWORK_OBJECT_SIZE * 16;
+	public static final int NETWORK_OBJECT_SIZE = 10240;
+	public static final int NETWORK_BUFFER_SIZE = NETWORK_OBJECT_SIZE * 8;
 }

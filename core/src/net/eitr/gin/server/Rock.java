@@ -1,5 +1,6 @@
 package net.eitr.gin.server;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -15,7 +16,8 @@ public class Rock extends WorldBody {
 
 	private float size;
 	private Body body;
-	float [] vertices;
+	private float [] vertices;
+	private Color color;
 
 	public Rock (Body b) {
 		super(WorldBodyType.ROCK);
@@ -36,6 +38,8 @@ public class Rock extends WorldBody {
 		fDef.restitution = 0.1f;
 		body.createFixture(fDef);
 		shape.dispose();
+		
+		color = new Color(MathUtils.random(0f,0.1f)+.6f,MathUtils.random(0f,0.1f)+.6f,MathUtils.random(0f,0.1f)+.6f,1);
 	}
 
 	public static short[] getTriangles (float[] v) {
@@ -80,7 +84,7 @@ public class Rock extends WorldBody {
 			return;
 		}
 		PolygonData poly = new PolygonData(body.getPosition().x, body.getPosition().y, body.getAngle(), vertices);
-		poly.setColor(0.8f, 0.8f, 0.8f, 1);
+		poly.setColor(color.r,color.g,color.b,color.a);
 		g.rocks.add(poly);
 	}
 }

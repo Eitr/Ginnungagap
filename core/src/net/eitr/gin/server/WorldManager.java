@@ -84,11 +84,12 @@ public class WorldManager {
 	}
 
 	protected void simulate () {
-		world.step(1/300f, 6, 2);
 		timeAccumulator += Gdx.graphics.getDeltaTime();
-		while (timeAccumulator >= Units.TIME_STEP) {
-			world.step(Units.TIME_STEP,6,2);
-			timeAccumulator -= Units.TIME_STEP;
+		synchronized (world) {
+			while (timeAccumulator >= Units.TIME_STEP) {
+				world.step(Units.TIME_STEP,6,2);
+				timeAccumulator -= Units.TIME_STEP;
+			}
 		}
 		Iterator<Projectile> ps = projectiles.iterator();
 		while (ps.hasNext()) {
@@ -126,6 +127,8 @@ public class WorldManager {
 		// Create the fixture definition for this body
 		EdgeShape edgeShape = new EdgeShape();
 		FixtureDef fDef = new FixtureDef();
+		fDef.friction = 0f;
+		fDef.restitution = 0.5f;
 		int w = Units.WORLD_WIDTH/2;
 		int h = Units.WORLD_HEIGHT/2;
 		edgeShape.set(-w,-h,w,-h);

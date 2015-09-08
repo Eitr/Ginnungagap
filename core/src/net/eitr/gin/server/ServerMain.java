@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.esotericsoftware.kryonet.*;
+import com.esotericsoftware.minlog.Log;
 
 import net.eitr.gin.Units;
 import net.eitr.gin.network.*;
@@ -62,13 +63,17 @@ public class ServerMain implements ApplicationListener {
 		GraphicsData data = new GraphicsData();
 		int[] keys = players.getConnectedPlayers();
 		for (int id : keys) {
-			if (players.isConnectionReady(id)) {
-				data.reset();
-				data.setPlayerPosition(players.getPlayerPosition(id));
-				players.getGraphics(id,data);
-				world.getGraphics(data);
-				server.sendToTCP(id,data);
-				players.setConnectionReady(id, false);
+			try {
+				if (players.isConnectionReady(id)) {
+					data.reset();
+					data.setPlayerPosition(players.getPlayerPosition(id));
+					players.getGraphics(id,data);
+					world.getGraphics(data);
+					server.sendToTCP(id,data);
+					players.setConnectionReady(id, false);
+				}
+			} catch (NullPointerException e) {
+				Log.error("Null player (probably disconnected)"); //TODO
 			}
 		}
 		world.simulate();

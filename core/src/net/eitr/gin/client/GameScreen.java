@@ -23,6 +23,9 @@ public class GameScreen implements Screen {
 	private Client client;
 	private GraphicsManager graphics;
 	
+	private long lastPacketTime = System.currentTimeMillis();
+	private long lastTimeAccumulator = 0;
+	
 	public GameScreen (String ip) {
 		gameView = new FitViewport(Units.VIEW_SIZE, Units.VIEW_SIZE/16*9); // 16:9 aspect ratio
 		guiView = new FitViewport(1366,768);//1600,900);
@@ -56,7 +59,13 @@ public class GameScreen implements Screen {
 		        	if (object instanceof GraphicsData) {
 		        		graphics.setGraphicsData((GraphicsData)object);
 		        		client.updateReturnTripTime();
-		        		gui.debug("ping", client.getReturnTripTime());
+		        		lastTimeAccumulator += System.currentTimeMillis()-lastPacketTime;
+		        		if (lastTimeAccumulator > 1000) {
+			        		gui.debug("latency", ((int)(1.0/(System.currentTimeMillis()-lastPacketTime)*1000.0))+" fps");
+			        		gui.debug("ping", client.getReturnTripTime()+" ms");
+			        		lastTimeAccumulator -= 1000;
+		        		}
+		        		lastPacketTime = System.currentTimeMillis();
 		        	}
 		        }
 		     });
@@ -67,11 +76,11 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
 		input.handleInput();
 		cameraControl();
+		
+		Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		client.sendTCP(input.getInputData());
 
@@ -81,6 +90,7 @@ public class GameScreen implements Screen {
 	
 	private void cameraControl () {
 		camera.position.set(graphics.data.x, graphics.data.y, 0);
+		
 		// Sets min/max for zoom
 		camera.zoom = MathUtils.clamp(camera.zoom, 0.5f, 3f);
 
