@@ -1,4 +1,4 @@
-package net.eitr.gin.ship;
+package net.eitr.gin.server.ship;
 
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
@@ -8,16 +8,17 @@ import net.eitr.gin.network.CircleData;
 import net.eitr.gin.network.RectData;
 import net.eitr.gin.network.ShapeData;
 import net.eitr.gin.network.ShipData;
+import net.eitr.gin.server.WorldManager;
 
 public class ShipPart {
 
-	Body ship;
-	DrawShapeType drawType;
-	public ShipPartType type;
-	Vector2 pos;
-	int id;
-	float width,height,angle,radius;
-	public float health;
+	protected Body ship;
+	protected DrawShapeType drawType;
+	protected ShipPartType type;
+	protected Vector2 pos;
+	private int id;
+	protected float width,height,angle,radius;
+	protected float health;
 
 
 	public ShipPart (int i, Body b, ShipPartType t, Vector2 p, float w, float h, float a) {
@@ -42,10 +43,10 @@ public class ShipPart {
 		health = 100;
 	}
 	
-	protected void update (boolean isShooting) {}
+	protected void update (boolean isShooting, WorldManager world) {}
 	
 	//TODO polygon intersection
-	public boolean intersects (ShipPart part) {
+	boolean intersects (ShipPart part) {
 		if (drawType == DrawShapeType.CIRCLE && part.drawType == DrawShapeType.CIRCLE) {
 			return Intersector.overlaps(new Circle(pos,radius), new Circle(part.pos,part.radius));
 		}
@@ -61,7 +62,7 @@ public class ShipPart {
 		return false;
 	}
 	
-	public void damage (float damage) {
+	void damage (float damage) {
 		health = MathUtils.clamp(health-damage, 0, 100);
 	}
 	
@@ -69,7 +70,7 @@ public class ShipPart {
 		return id;
 	}
 
-	public void getGraphics (ShipData shipData) {
+	void getGraphics (ShipData shipData) {
 		ShapeData shape = null;
 		switch(drawType) {
 		case CIRCLE: shape = new CircleData(pos.x, pos.y, radius); break;

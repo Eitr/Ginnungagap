@@ -1,4 +1,4 @@
-package net.eitr.gin.ship;
+package net.eitr.gin.server.ship;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.MathUtils;
@@ -14,15 +14,16 @@ import net.eitr.gin.network.InputData;
 import net.eitr.gin.network.RectData;
 import net.eitr.gin.network.ShipData;
 import net.eitr.gin.server.WorldBody;
+import net.eitr.gin.server.WorldManager;
 
 public class Ship extends WorldBody {
 
 	public boolean connectionReady;
-	protected float width, height, thrust, rotationSpeed;
-	protected boolean thrusting, shooting, turningLeft, turningRight;
-	protected Body body;
-	protected IntMap<ShipPart> parts;
-	protected ShipBuilder shipBuilder;
+	private float width, height, thrust, rotationSpeed;
+	private boolean thrusting, shooting, turningLeft, turningRight;
+	Body body;
+	IntMap<ShipPart> parts;
+	private ShipBuilder shipBuilder;
 	
 	public ObjectMap<String,String> debugMap = new ObjectMap<String,String>();
 
@@ -153,17 +154,27 @@ public class Ship extends WorldBody {
 			}
 		}
 		
-		if (input.mouseDown) {
-			if (shipBuilder.isBuilding) {
-				shipBuilder.buildShip();
-			} else {
-				shooting = true;
+		for (int button : input.mouseDown) {
+			switch(button) {
+			case Input.Buttons.LEFT: 
+				if (shipBuilder.isBuilding) {
+					shipBuilder.buildShip();
+				} else {
+					shooting = true;
+				}
+				break;
 			}
 		}
-		if (input.mouseUp) {
-			shooting = false;
+		
+		for (int button : input.mouseUp) {
+			switch(button) {
+			case Input.Buttons.LEFT: shooting = false; break;
+			}
 		}
 	
+	}
+
+	public void update (WorldManager world) {
 		if (thrusting) {
 			thrust();
 		}
@@ -175,11 +186,9 @@ public class Ship extends WorldBody {
 		if (turningRight) {
 			rotateRight();
 		}
-	}
-
-	public void update () {
+		
 		for (ShipPart part : parts.values()) {
-			part.update(shooting);
+			part.update(shooting, world);
 		}
 
 		debug("mouse","("+(int)shipBuilder.mouse.x+","+(int)shipBuilder.mouse.y+")");

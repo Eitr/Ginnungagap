@@ -42,6 +42,7 @@ public class Rock extends WorldBody {
 		color = new Color(MathUtils.random(0f,0.1f)+.6f,MathUtils.random(0f,0.1f)+.6f,MathUtils.random(0f,0.1f)+.6f,1);
 	}
 
+	/** Create triangle regions that make up the polygon for rendering */
 	public static short[] getTriangles (float[] v) {
 		short[] points = new short[(v.length-4)/2*3];
 		for (int i=0; i < points.length/3; i++) {
@@ -67,19 +68,21 @@ public class Rock extends WorldBody {
 	}
 
 	private float[] generateCircularPolygon (float r) {
-		int p = 8; // total points around polygon (LIMIT 8 VERTICES PER POLYGON)
+		int p = 8; // total points around polygon (LIBGDX LIMIT 8 VERTICES PER POLYGON)
 		float [] vertices = new float[p*2];
 		float radians = MathUtils.PI*2f/p; // angle between vertices
 
 		for (int i=0; i < p; i++) {
-			float angle = MathUtils.random(0f,radians);
+			//TODO asteroid shaping
+//			float angle = MathUtils.random(0f,radians);
+			float angle = MathUtils.random(radians/2,radians);
 			vertices[i*2] = MathUtils.cos(angle+i*radians)*r;
 			vertices[i*2+1] = MathUtils.sin(angle+i*radians)*r;
 		}
 		return vertices;
 	}
 
-	public void getGraphics (GraphicsData g) {
+	void getGraphics (GraphicsData g) {
 		if (Vector2.dst(g.x, g.y, body.getPosition().x, body.getPosition().y) > Units.MAX_VIEW_DIST) { 
 			return;
 		}

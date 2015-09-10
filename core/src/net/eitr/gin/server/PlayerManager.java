@@ -3,54 +3,50 @@ package net.eitr.gin.server;
 import java.util.Iterator;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.IntMap;
 
 import net.eitr.gin.network.GraphicsData;
 import net.eitr.gin.network.InputData;
-import net.eitr.gin.ship.Ship;
+import net.eitr.gin.server.ship.Ship;
 
 public class PlayerManager {
 
 	private IntMap<Ship> players;
 	
-	public PlayerManager () {
+	PlayerManager () {
 		players = new IntMap<Ship>();
 	}
 	
-	protected void doPlayerInput (int id, InputData input) {
+	void doPlayerInput (int id, InputData input) {
 		players.get(id).handleInput(input);
 	}
 	
-	protected int[] getConnectedPlayers () {
+	int[] getConnectedPlayers () {
 		return players.keys().toArray().items;
 	}
 	
-
-	protected Vector2 getPlayerPosition (int id) {
+	Vector2 getPlayerPosition (int id) {
 		return players.get(id).getPosition();
 	}
 	
-	protected void createPlayer (int id) {
-		BodyDef shipDef = new BodyDef();
-		shipDef.type = BodyType.DynamicBody;
-		shipDef.position.set(0,0);
-		players.put(id, new Ship(WorldManager.world.createBody(shipDef)));
+	//TODO: load player from db
+	void createPlayer (int id, Body body) {
+		players.put(id, new Ship(body));
 	}
 	
-	protected void removePlayer (int id) {
-		WorldManager.world.destroyBody(players.get(id).getBody());
-		players.remove(id);
+	Body removePlayer (int id) {
+		return players.remove(id).getBody();
 	}
 
-	protected void simulate () {
+	void simulate (WorldManager world) {
+		//Update ship parts, such as weapons firing
 		for (Ship ship : players.values()) {
-			ship.update();
+			ship.update(world);
 		}
 	}
 	
-	protected void getGraphics (int id, GraphicsData g) {
+	void getGraphics (int id, GraphicsData g) {
 		for(Ship ship : players.values()) {
 			ship.getGraphics(g);
 		}
@@ -66,11 +62,11 @@ public class PlayerManager {
 		g.debug = labels;
 	}
 	
-	protected void setConnectionReady (int id, boolean ready) {
+	void setConnectionReady (int id, boolean ready) {
 		players.get(id).connectionReady = ready;
 	}
 	
-	protected boolean isConnectionReady (int id) {
+	boolean isConnectionReady (int id) {
 		return players.get(id).connectionReady;
 	}
 	

@@ -11,13 +11,12 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class DebugInterface extends Stage {
 	
-	Label fpsLabel;
-	LabelStyle style;
-	Viewport view;
-	int gap = 20;
-	int z = 1;
+	private LabelStyle style;
+	private Viewport view;
+	private int gap = 20;
+	private int z = 1;
 	
-	ObjectMap<String,Label> map = new ObjectMap<String,Label>();
+	private ObjectMap<String,Label> map = new ObjectMap<String,Label>();
 	
 	public DebugInterface (Viewport v) {
 		super(v);
@@ -28,14 +27,14 @@ public class DebugInterface extends Stage {
 		style.fontColor = Color.WHITE;
 	}
 	
-	public void update () {
+	void update () {
 		act(Gdx.graphics.getDeltaTime());
 		synchronized (map){
 			draw();
 		}
 	}
 	
-	public void debug (String s, Object value) {
+	void debug (String s, Object value) {
 		if (s.equals("")) {
 			return;
 		}

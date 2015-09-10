@@ -12,9 +12,8 @@ import net.eitr.gin.network.InputData;
 public class InputHandler implements InputProcessor {
 
 	private OrthographicCamera camera;
-	private Array<Integer> keysDown;
-	private Array<Integer> keysUp;
-	private boolean mouseDown, mouseUp;
+	private Array<Integer> keysDown, keysUp;
+	private Array<Integer> mouseDown, mouseUp;
 	private float mx,my;
 	private boolean send;
 
@@ -22,35 +21,38 @@ public class InputHandler implements InputProcessor {
 		camera = c;
 		keysDown = new Array<Integer>();
 		keysUp = new Array<Integer>();
+		mouseDown = new Array<Integer>();
+		mouseUp = new Array<Integer>();
 	}
 	
-	//TODO
-	public boolean shouldSend () {
+	//TODO whether new input has arrived
+	private boolean shouldSend () {
 		return send;
 	}
 	
-	public void resetInput () {
-		mouseDown = false;
-		mouseUp = false;
+	private void resetInput () {
 		keysDown.clear();
 		keysUp.clear();
+		mouseDown.clear();
+		mouseUp.clear();
 		send = false;
 	}
 	
-	public InputData getInputData () {
+	/** Used to send player input to server */
+	InputData getInputData () {
 		InputData data = new InputData();
 		data.mx = mx;
 		data.my = my;
-		data.mouseDown = mouseDown;
-		data.mouseUp = mouseUp;
 		data.keysDown = new Array<Integer>(keysDown);
 		data.keysUp = new Array<Integer>(keysUp);
+		data.mouseDown = new Array<Integer>(mouseDown);
+		data.mouseUp = new Array<Integer>(mouseUp);
 		
 		resetInput();
 		return data;
 	}
 
-	public void handleInput () {
+	void handleInput () {
 		if (Gdx.input.isKeyPressed(Input.Keys.EQUALS)) {
 			camera.zoom -= 0.02;
 		}
@@ -99,14 +101,14 @@ public class InputHandler implements InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		mouseDown = true;
+		mouseDown.add(button);
 		return false;
 	}
 
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		mouseUp = true;
+		mouseUp.add(button);
 		return false;
 	}
 

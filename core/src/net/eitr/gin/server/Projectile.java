@@ -1,4 +1,4 @@
-package net.eitr.gin.ship;
+package net.eitr.gin.server;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
@@ -11,17 +11,14 @@ import net.eitr.gin.Units;
 import net.eitr.gin.Units.WorldBodyType;
 import net.eitr.gin.network.GraphicsData;
 import net.eitr.gin.network.RectData;
-import net.eitr.gin.server.WorldBody;
 
 
 public class Projectile extends WorldBody {
 
-	public Body body;
-	float size, speed;
-	float timeAccumulator;
-	float timeToLive;
+	Body body;
+	private float size, speed, damage;
+	private float timeAccumulator, timeToLive;
 	public boolean remove;
-	float damage;
 
 	public Projectile (Body b, Vector2 v, float a) {
 		super(WorldBodyType.PROJECTILE);
@@ -53,14 +50,14 @@ public class Projectile extends WorldBody {
 		return damage;
 	}
 	
-	public void update () {
+	void update () {
 		timeAccumulator += Gdx.graphics.getDeltaTime();
 		if (timeAccumulator >= timeToLive || remove) {
 			remove = true;
 		}
 	}
 
-	public void getGraphics (GraphicsData g) {
+	void getGraphics (GraphicsData g) {
 		if (Vector2.dst(g.x, g.y, body.getPosition().x, body.getPosition().y) > Units.MAX_VIEW_DIST) { 
 			return;
 		}

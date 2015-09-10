@@ -14,6 +14,8 @@ public class Units {
 	
 	public static enum DrawShapeType {POLYGON,CIRCLE,RECT};
 	public static enum ShipPartType {WEAPON,HULL};
+	
+	/** Every physical object must extend WorldBody (used for collision) */
 	public static enum WorldBodyType {EDGE,SHIP,ROCK,PROJECTILE};
 
 	public static final int TCP_PORT = 54555;

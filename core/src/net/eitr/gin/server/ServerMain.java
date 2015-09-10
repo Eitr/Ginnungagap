@@ -11,8 +11,8 @@ import net.eitr.gin.network.*;
 
 public class ServerMain implements ApplicationListener {
 
-	public static WorldManager world;
-	private static PlayerManager players;
+	private WorldManager world;
+	private PlayerManager players;
 
 	private Server server;
 
@@ -22,6 +22,13 @@ public class ServerMain implements ApplicationListener {
 	
 	@Override
 	public void create() {
+		networkConnection();
+		world = new WorldManager();
+		players = new PlayerManager();
+	}
+	
+	/** Setup server socket and data receiver */
+	private void networkConnection () {
 		try {
 			server = new Server(Units.NETWORK_BUFFER_SIZE, Units.NETWORK_OBJECT_SIZE);
 			Network.registerClasses(server.getKryo());
@@ -31,11 +38,11 @@ public class ServerMain implements ApplicationListener {
 			// PLAYER INPUT
 			server.addListener(new Listener() {
 				public void connected (Connection connection) {
-					players.createPlayer(connection.getID());
+					players.createPlayer(connection.getID(), world.createShipBody());
 				}
 				
 				public void disconnected (Connection connection) {
-					players.removePlayer(connection.getID());
+					world.destroyBody(players.removePlayer(connection.getID()));
 				}
 				
 				public void received (Connection connection, Object object) {
@@ -53,9 +60,6 @@ public class ServerMain implements ApplicationListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		world = new WorldManager();
-		players = new PlayerManager();
 	}
 
 	@Override
@@ -76,8 +80,8 @@ public class ServerMain implements ApplicationListener {
 				Log.error("Null player (probably disconnected)"); //TODO
 			}
 		}
+		players.simulate(world);
 		world.simulate();
-		players.simulate();
 	}
 
 	@Override

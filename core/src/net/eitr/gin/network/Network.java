@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Array;
 
 public class Network {
 
+	/** The server and each client must register the serialized networked classes */
 	public static void registerClasses (Kryo kryo) {
 		kryo.register(GraphicsData.class);
 		kryo.register(Array.class);

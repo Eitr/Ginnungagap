@@ -18,11 +18,12 @@ import net.eitr.gin.server.Rock;
 
 public class GraphicsManager {
 
-	SpriteBatch sprites;
-	PolygonSpriteBatch polygons;
-	ShapeRenderer shapes;
+	private SpriteBatch sprites;
+	private PolygonSpriteBatch polygons;
+	private ShapeRenderer shapes;
+	private TextureRegion rockTexture;
+	
 	GraphicsData data;
-	TextureRegion rockTexture;
 	
 	public GraphicsManager () {
 		sprites = new SpriteBatch();
@@ -36,11 +37,11 @@ public class GraphicsManager {
 		rockTexture = new TextureRegion(new Texture(pix));
 	}
 	
-	public void setGraphicsData (GraphicsData d) {
+	void setGraphicsData (GraphicsData d) {
 		data = d;
 	}
 	
-	public void render (OrthographicCamera camera) {
+	void render (OrthographicCamera camera) {
 		sprites.setProjectionMatrix(camera.combined);
 		shapes.setProjectionMatrix(camera.combined);
 		polygons.setProjectionMatrix(camera.combined);
@@ -101,8 +102,7 @@ public class GraphicsManager {
 		}
 	}
 
-
-	public void dispose() {
+	void dispose() {
 		sprites.dispose();
 		shapes.dispose();
 		polygons.dispose();

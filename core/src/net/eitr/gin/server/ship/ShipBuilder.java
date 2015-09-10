@@ -1,4 +1,4 @@
-package net.eitr.gin.ship;
+package net.eitr.gin.server.ship;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -11,13 +11,13 @@ import net.eitr.gin.network.ShipData;
 
 public class ShipBuilder {
 
-	public float width,height,radius,rotation;
-	public DrawShapeType shape;
-	public ShipPartType buildType;
+	float width,height,rotation;
+	DrawShapeType shape;
+	ShipPartType buildType;
 	ShipPart newPart;
-	Ship ship;
-	Vector2 mouse;
-	public boolean isBuilding;
+	private Ship ship;
+	protected Vector2 mouse;
+	protected boolean isBuilding;
 
 	public ShipBuilder (Ship s) {
 		ship = s;
@@ -32,8 +32,7 @@ public class ShipBuilder {
 	}
 
 	//TODO changing types
-	public void buildNewPart () {
-
+	void buildNewPart () {
 		switch (shape) {
 		case RECT:
 			switch (buildType){
@@ -50,7 +49,7 @@ public class ShipBuilder {
 		}
 	}
 
-	public void buildShip () {
+	void buildShip () {
 		if (!isBuilding) {
 			return;
 		}
@@ -60,8 +59,7 @@ public class ShipBuilder {
 		}
 	}
 	
-	protected void addNewPart (ShipPart part) {
-
+	void addNewPart (ShipPart part) {
 		FixtureDef fDef = new FixtureDef();
 		fDef.density = 1f;
 		fDef.friction = 0.4f;
@@ -91,15 +89,15 @@ public class ShipBuilder {
 		ship.parts.put(part.getId(), part);
 	}
 
-	public void rotate (float angle) {
+	void rotate (float angle) {
 		rotation = (angle+360)%360;
 	}
 
-	public void setMousePosition (Vector2 m) {
+	void setMousePosition (Vector2 m) {
 		mouse = m;
 	}
 
-	public void getGraphics (ShipData shipData) {
+	void getGraphics (ShipData shipData) {
 		if (!isBuilding) {
 			return;
 		}

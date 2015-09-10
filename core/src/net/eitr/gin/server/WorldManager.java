@@ -12,18 +12,16 @@ import com.badlogic.gdx.utils.Array;
 import net.eitr.gin.Units;
 import net.eitr.gin.Units.WorldBodyType;
 import net.eitr.gin.network.GraphicsData;
-import net.eitr.gin.ship.*;
+import net.eitr.gin.server.ship.*;
 
 public class WorldManager {
 
-	protected static World world;
-
+	private World world;
 	private Array<Rock> rocks;
+	private float timeAccumulator = 0;
+	private Array<Projectile> projectiles;
 
-	float timeAccumulator = 0;
-	public Array<Projectile> projectiles;
-
-	Box2DDebugRenderer debugRenderer;
+	private Box2DDebugRenderer debugRenderer;
 
 	public WorldManager () {
 		init();
@@ -65,13 +63,13 @@ public class WorldManager {
 		});
 	}
 
-
-	protected void draw (OrthographicCamera cam) {
+	//TODO: debug view on server
+	private void draw (OrthographicCamera camera) {
 		debugRenderer.setDrawVelocities(true);
-		debugRenderer.render(world, cam.combined);
+		debugRenderer.render(world, camera.combined);
 	}
 	
-	protected void getGraphics (GraphicsData g) {
+	void getGraphics (GraphicsData g) {
 		for(Rock rock : rocks) {
 			rock.getGraphics(g);
 		}
@@ -83,7 +81,7 @@ public class WorldManager {
 		
 	}
 
-	protected void simulate () {
+	void simulate () {
 		timeAccumulator += Gdx.graphics.getDeltaTime();
 		synchronized (world) {
 			while (timeAccumulator >= Units.TIME_STEP) {
@@ -101,6 +99,12 @@ public class WorldManager {
 			}
 		}
 	}
+
+	private void init () {
+		world = new World(new Vector2(0,0), true);
+		debugRenderer = new Box2DDebugRenderer();
+		projectiles = new Array<Projectile>();
+	}
 	
 	private void createRocks () {
 		rocks = new Array<Rock>();
@@ -110,12 +114,6 @@ public class WorldManager {
 			rockDef.position.set(MathUtils.random(-Units.WORLD_WIDTH/2f,Units.WORLD_WIDTH/2f),MathUtils.random(-Units.WORLD_HEIGHT/2f,Units.WORLD_HEIGHT/2f));
 			rocks.add(new Rock(world.createBody(rockDef)));
 		}
-	}
-
-	private void init () {
-		world = new World(new Vector2(0,0), true);
-		debugRenderer = new Box2DDebugRenderer();
-		projectiles = new Array<Projectile>();
 	}
 
 	private void createWorldEdges () {
@@ -146,7 +144,18 @@ public class WorldManager {
 		edgeShape.dispose();
 	}
 
-	public static Body getNewWorldBody (BodyDef def) {
-		return world.createBody(def);
+	Body createShipBody () {
+		BodyDef shipDef = new BodyDef();
+		shipDef.type = BodyType.DynamicBody;
+		shipDef.position.set(0,0);
+		return world.createBody(shipDef);
+	}
+	
+	void destroyBody (Body obj) {
+		world.destroyBody(obj);
+	}
+	
+	public void createNewProjectile (BodyDef def, Vector2 pos, float angle) {
+		projectiles.add(new Projectile(world.createBody(def),pos,angle));
 	}
 }

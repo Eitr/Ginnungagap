@@ -16,15 +16,15 @@ import net.eitr.gin.network.*;
 
 public class GameScreen implements Screen {
 
-	OrthographicCamera camera;
-	Viewport gameView, guiView;
-	static DebugInterface gui;
-	InputHandler input;
+	private OrthographicCamera camera;
+	private Viewport gameView, guiView;
+	private InputHandler input;
 	private Client client;
 	private GraphicsManager graphics;
-	
 	private long lastPacketTime = System.currentTimeMillis();
 	private long lastTimeAccumulator = 0;
+
+	static DebugInterface gui;
 	
 	public GameScreen (String ip) {
 		gameView = new FitViewport(Units.VIEW_SIZE, Units.VIEW_SIZE/16*9); // 16:9 aspect ratio
@@ -47,6 +47,7 @@ public class GameScreen implements Screen {
 		networkConnection(ip);
 	}
 	
+	/** Setup client socket and data receiver */
 	private void networkConnection (String ip) {
 		try {
 			client = new Client(Units.NETWORK_BUFFER_SIZE, Units.NETWORK_OBJECT_SIZE);
@@ -123,6 +124,7 @@ public class GameScreen implements Screen {
 	@Override
 	public void dispose() {
 		gui.dispose();
+		graphics.dispose();
 		client.stop();
 	}
 
