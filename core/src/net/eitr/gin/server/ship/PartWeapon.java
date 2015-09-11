@@ -1,6 +1,7 @@
 package net.eitr.gin.server.ship;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -14,10 +15,11 @@ public class PartWeapon extends ShipPart {
 
 	private float timeAccumulator, fireRate;
 	
-	public PartWeapon(int i, Body b, Vector2 p, float w, float h, float a) {
+	public PartWeapon (int i, Body b, Vector2 p, float w, float h, float a) {
 		super(i, b, ShipPartType.WEAPON, p, w, h, a);
 		timeAccumulator = 0;
 		fireRate = 5;
+		color = new Color(1,0,0,1);
 	}
 		
 	protected void update (boolean isShooting, WorldManager world) {

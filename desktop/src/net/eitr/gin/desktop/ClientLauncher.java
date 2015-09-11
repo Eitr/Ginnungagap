@@ -5,6 +5,7 @@ import javax.swing.JOptionPane;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 
+import net.eitr.gin.Units;
 import net.eitr.gin.client.ClientMain;
 
 public class ClientLauncher {
@@ -17,6 +18,7 @@ public class ClientLauncher {
 		config.vSyncEnabled = false;
 		config.width = 1366;
 		config.height = 768;
+		config.title = "Client - "+Units.version;
 		
 		new OutputFrame("Client Output");
 

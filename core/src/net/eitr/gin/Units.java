@@ -1,7 +1,9 @@
 package net.eitr.gin;
 
 public class Units {
-
+	
+	public static final String version = "v0.1.0";
+	
 	public static final int WORLD_WIDTH = 500;
 	public static final int WORLD_HEIGHT = 500;
 
@@ -13,7 +15,7 @@ public class Units {
 	public static final float TIME_STEP = 1/300f;
 	
 	public static enum DrawShapeType {POLYGON,CIRCLE,RECT};
-	public static enum ShipPartType {WEAPON,HULL};
+	public static enum ShipPartType {WEAPON,HULL,THRUSTER};
 	
 	/** Every physical object must extend WorldBody (used for collision) */
 	public static enum WorldBodyType {EDGE,SHIP,ROCK,PROJECTILE};

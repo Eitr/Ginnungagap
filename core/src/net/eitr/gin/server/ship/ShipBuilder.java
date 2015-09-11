@@ -38,6 +38,8 @@ public class ShipBuilder {
 			switch (buildType){
 			case HULL: newPart = new ShipPart(ship.getNewPartId(), ship.body, ShipPartType.HULL, new Vector2(0,0), width, height, rotation); break;
 			case WEAPON: newPart = new PartWeapon(ship.getNewPartId(), ship.body, new Vector2(0,0), width, height, rotation); break;
+			case THRUSTER: newPart = new PartThruster(ship.getNewPartId(), ship.body, new Vector2(0,0), width, height, rotation); break;
+			default: break;
 			}
 			break;
 		case CIRCLE:
@@ -85,6 +87,13 @@ public class ShipBuilder {
 			break;
 		default:
 			return;
+		}
+		
+		switch (part.type) {
+		case HULL: break;
+		case THRUSTER: ship.thrust += ((PartThruster)part).thrust; break;
+		case WEAPON: break;
+		default: break;
 		}
 		ship.parts.put(part.getId(), part);
 	}

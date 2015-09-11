@@ -19,7 +19,7 @@ import net.eitr.gin.server.WorldManager;
 public class Ship extends WorldBody {
 
 	public boolean connectionReady;
-	private float width, height, thrust, rotationSpeed;
+	float width, height, thrust, rotationSpeed;
 	private boolean thrusting, shooting, turningLeft, turningRight;
 	Body body;
 	IntMap<ShipPart> parts;
@@ -33,7 +33,7 @@ public class Ship extends WorldBody {
 		body = b;
 		width = 8;
 		height = 4;
-		thrust = 20f;
+		thrust = 0f;
 		rotationSpeed = 10.0f*32f;
 		thrusting = false;
 		connectionReady = true;
@@ -43,7 +43,7 @@ public class Ship extends WorldBody {
 		body.setAngularDamping(rotationSpeed*10/32f);
 		shipBuilder = new ShipBuilder(this);
 
-		shipBuilder.addNewPart(new ShipPart(getNewPartId(), body, ShipPartType.HULL, new Vector2(0,0), width, height, 0));
+		shipBuilder.addNewPart(new PartThruster(getNewPartId(), body, new Vector2(0,0), width, height, 0));
 		shipBuilder.addNewPart(new ShipPart(getNewPartId(), body, ShipPartType.HULL, new Vector2(0,0), height/2, width, MathUtils.PI));
 		shipBuilder.addNewPart(new PartWeapon(getNewPartId(), body, new Vector2(0,width/2), width/2, height/4, 0));
 		shipBuilder.addNewPart(new PartWeapon(getNewPartId(), body, new Vector2(0,-width/2), width/2, height/4, 0));
@@ -123,7 +123,9 @@ public class Ship extends WorldBody {
 			case Input.Keys.NUM_1: shipBuilder.buildType = ShipPartType.HULL; 
 				shipBuilder.buildNewPart(); break;
 			case Input.Keys.NUM_2: shipBuilder.buildType = ShipPartType.WEAPON; 
-				shipBuilder.buildNewPart(); break;
+			shipBuilder.buildNewPart(); break;
+			case Input.Keys.NUM_3: shipBuilder.buildType = ShipPartType.THRUSTER; 
+			shipBuilder.buildNewPart(); break;
 			case Input.Keys.S:
 				switch(shipBuilder.shape) {
 				case RECT: shipBuilder.shape = DrawShapeType.CIRCLE; break;
@@ -206,15 +208,16 @@ public class Ship extends WorldBody {
 		shipBuilder.getGraphics(shipData);
 		for (ShipPart part : parts.values()) {
 			part.getGraphics(shipData);
+
+			if (thrusting && part.type == ShipPartType.THRUSTER) {
+				for (int t = 0; t < 5; t++) {
+					RectData tr = new RectData(part.pos.x-MathUtils.random(0,part.width/2)-part.width/2,part.pos.y-MathUtils.random(-part.height/3,part.height/3),0.3f,0.3f);
+					tr.setColor(1f, .8f, 0f, 1f);
+					shipData.parts.add(tr);
+				}
+	 		}
 		}
 
-		if (thrusting) {
-			for (int t = 0; t < 5; t++) {
-				RectData tr = new RectData(-MathUtils.random(0,width/3)-width/2,-MathUtils.random(-height/3,height/3),0.3f,0.3f);
-				tr.setColor(1f, .8f, 0f, 1f);
-				shipData.parts.add(tr);
-			}
- 		}
 		g.ships.add(shipData);
 	}
 

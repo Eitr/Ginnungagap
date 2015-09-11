@@ -3,6 +3,7 @@ package net.eitr.gin.desktop;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 
+import net.eitr.gin.Units;
 import net.eitr.gin.server.ServerMain;
 
 public class ServerLauncher {
@@ -15,7 +16,7 @@ public class ServerLauncher {
 		config.vSyncEnabled = true;
 		config.width = 1366;
 		config.height = 768;
-//		config.title = Main.version; //TODO
+		config.title = "Server - "+Units.version;
 
 		new OutputFrame("Server Output");
 		

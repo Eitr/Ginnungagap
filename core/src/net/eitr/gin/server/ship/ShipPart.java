@@ -1,5 +1,6 @@
 package net.eitr.gin.server.ship;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 
@@ -19,8 +20,9 @@ public class ShipPart {
 	private int id;
 	protected float width,height,angle,radius;
 	protected float health;
+	protected Color color; //TODO individual part color
 
-
+	// RECT shape
 	public ShipPart (int i, Body b, ShipPartType t, Vector2 p, float w, float h, float a) {
 		init(i,b,t,p);
 		drawType = DrawShapeType.RECT;
@@ -29,6 +31,7 @@ public class ShipPart {
 		angle = a;
 	}
 
+	// CIRCLE shape
 	public ShipPart (int i, Body b, ShipPartType t, Vector2 p, float r) {
 		init(i,b,t,p);
 		drawType = DrawShapeType.CIRCLE;
@@ -41,6 +44,7 @@ public class ShipPart {
 		type = t;
 		pos = p;
 		health = 100;
+		color = new Color(0,0,1,1);
 	}
 	
 	protected void update (boolean isShooting, WorldManager world) {}
@@ -77,7 +81,7 @@ public class ShipPart {
 		case RECT: shape = new RectData(pos.x-width/2f, pos.y-height/2f, width, height); break;
 		default: return;
 		}
-		shape.setColor(0, health/100f, health/100f, 1);
+		shape.setColor(health/100f*color.r, health/100f*color.g, health/100f*color.b, 1);
 		shipData.parts.add(shape);
 	}
 }
