@@ -6,7 +6,7 @@ public class CircleData extends ShapeData {
 	public CircleData () {}
 	
 	public CircleData (float px, float py, float r) {
-		super(px,py);
+		super(px,py,0);
 		radius = r;
 	}
 }

@@ -12,12 +12,14 @@ import net.eitr.gin.server.ship.Ship;
 
 public class PlayerManager {
 
+	/** Mapping of connected players with their client id. */
 	private IntMap<Ship> players;
 	
 	PlayerManager () {
 		players = new IntMap<Ship>();
 	}
 	
+	/** Called when input data is received from the client. */
 	void doPlayerInput (int id, InputData input) {
 		players.get(id).handleInput(input);
 	}
@@ -35,12 +37,13 @@ public class PlayerManager {
 		players.put(id, new Ship(body));
 	}
 	
+	/** Removes player from connection list. Make sure the world destroys the returned physics body. */
 	Body removePlayer (int id) {
 		return players.remove(id).getBody();
 	}
 
-	void simulate (WorldManager world) {
-		//Update ship parts, such as weapons firing
+	/** Update ship parts, such as weapons/thrusters firing */
+	void update (WorldManager world) {
 		for (Ship ship : players.values()) {
 			ship.update(world);
 		}
@@ -50,8 +53,9 @@ public class PlayerManager {
 		for(Ship ship : players.values()) {
 			ship.getGraphics(g);
 		}
-		
+
 		Ship player = players.get(id);
+		
 		// Generate debug labels
 		Iterator<String> keys = player.debugMap.keys();
 		String [] labels = new String[player.debugMap.size];

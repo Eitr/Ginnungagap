@@ -19,8 +19,9 @@ import net.eitr.gin.server.WorldManager;
 public class Ship extends WorldBody {
 
 	public boolean connectionReady;
-	float width, height, thrust, rotationSpeed;
-	private boolean thrusting, shooting, turningLeft, turningRight;
+	float width, height, rotationSpeed;
+	boolean thrusting, shooting, turningLeft, turningRight;
+	
 	Body body;
 	IntMap<ShipPart> parts;
 	private ShipBuilder shipBuilder;
@@ -31,9 +32,8 @@ public class Ship extends WorldBody {
 		super(WorldBodyType.SHIP);
 		
 		body = b;
-		width = 8;
+		width = 4;
 		height = 4;
-		thrust = 0f;
 		rotationSpeed = 10.0f*32f;
 		thrusting = false;
 		connectionReady = true;
@@ -43,15 +43,16 @@ public class Ship extends WorldBody {
 		body.setAngularDamping(rotationSpeed*10/32f);
 		shipBuilder = new ShipBuilder(this);
 
-		shipBuilder.addNewPart(new PartThruster(getNewPartId(), body, new Vector2(0,0), width, height, 0));
-		shipBuilder.addNewPart(new ShipPart(getNewPartId(), body, ShipPartType.HULL, new Vector2(0,0), height/2, width, MathUtils.PI));
-		shipBuilder.addNewPart(new PartWeapon(getNewPartId(), body, new Vector2(0,width/2), width/2, height/4, 0));
-		shipBuilder.addNewPart(new PartWeapon(getNewPartId(), body, new Vector2(0,-width/2), width/2, height/4, 0));
-		shipBuilder.addNewPart(new ShipPart(getNewPartId(), body, ShipPartType.HULL, new Vector2(width/2,0), height/2));
+		shipBuilder.addNewPart(new PartWeapon(getNewPartId(), body, new Vector2(0,width), width, height/4, 0));
+		shipBuilder.addNewPart(new PartWeapon(getNewPartId(), body, new Vector2(0,-width), width, height/4, 0));
+		shipBuilder.addNewPart(new PartHull(getNewPartId(), body, new Vector2(width/2,0), width, height, 0));
+		shipBuilder.addNewPart(new PartHull(getNewPartId(), body, new Vector2(0,0), height/2, width*2, 0));
+		shipBuilder.addNewPart(new PartHull(getNewPartId(), body, new Vector2(width,0), height/2));
+		shipBuilder.addNewPart(new PartThruster(getNewPartId(), body, new Vector2(-width/2,0), width, height, 0));
 	}
 	
 	public void damagePart (int id, float damage) {
-		parts.get(id).damage(damage);
+		parts.get(id).adjustHealth(-damage);
 	}
 
 	private void rotateLeft () {
@@ -62,12 +63,10 @@ public class Ship extends WorldBody {
 		body.setAngularVelocity(-rotationSpeed/body.getMass());
 	}
 
-	private void thrust () {
+	void thrust (float thrust, Vector2 origin) {
 		float xforce = (float)(Math.cos(body.getAngle())*thrust);
 		float yforce = (float)(Math.sin(body.getAngle())*thrust);
-		//    	body.applyForceToCenter(xforce,yforce,true);
-		body.applyLinearImpulse(xforce, yforce, body.getPosition().x, body.getPosition().y, true);
-		thrusting = true;
+		body.applyLinearImpulse(xforce, yforce, origin.x+body.getPosition().x, origin.y+body.getPosition().y, true);
 	}
 	
 	public void resetPosition () {
@@ -117,6 +116,10 @@ public class Ship extends WorldBody {
 			case Input.Keys.W: thrusting = true; break;
 			case Input.Keys.A: turningLeft = true; break;
 			case Input.Keys.D: turningRight = true; break;
+			case Input.Keys.E: shipBuilder.rotate(-10);
+				shipBuilder.buildNewPart();  break;
+			case Input.Keys.Q: shipBuilder.rotate(10);
+				shipBuilder.buildNewPart();  break;
 			case Input.Keys.R: resetPosition(); break;
 			case Input.Keys.B: shipBuilder.isBuilding = !shipBuilder.isBuilding;
 				shipBuilder.buildNewPart(); break;
@@ -177,10 +180,6 @@ public class Ship extends WorldBody {
 	}
 
 	public void update (WorldManager world) {
-		if (thrusting) {
-			thrust();
-		}
-		
 		if (turningLeft) {
 			rotateLeft();
 		}
@@ -190,7 +189,7 @@ public class Ship extends WorldBody {
 		}
 		
 		for (ShipPart part : parts.values()) {
-			part.update(shooting, world);
+			part.update(this, world);
 		}
 
 		debug("mouse","("+(int)shipBuilder.mouse.x+","+(int)shipBuilder.mouse.y+")");
@@ -209,9 +208,9 @@ public class Ship extends WorldBody {
 		for (ShipPart part : parts.values()) {
 			part.getGraphics(shipData);
 
-			if (thrusting && part.type == ShipPartType.THRUSTER) {
+			if (thrusting && part.type == ShipPartType.THRUSTER && part.health > 0) {
 				for (int t = 0; t < 5; t++) {
-					RectData tr = new RectData(part.pos.x-MathUtils.random(0,part.width/2)-part.width/2,part.pos.y-MathUtils.random(-part.height/3,part.height/3),0.3f,0.3f);
+					RectData tr = new RectData(part.pos.x-MathUtils.random(0,part.width/2)-part.width/2,part.pos.y-MathUtils.random(-part.height/3,part.height/3), body.getAngle(), 0.3f, 0.3f);
 					tr.setColor(1f, .8f, 0f, 1f);
 					shipData.parts.add(tr);
 				}

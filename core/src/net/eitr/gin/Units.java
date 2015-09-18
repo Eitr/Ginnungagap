@@ -8,11 +8,9 @@ public class Units {
 	public static final int WORLD_HEIGHT = 500;
 
 	public static final int VIEW_SIZE = 8*16;
-	public static final int MAX_VIEW_DIST = VIEW_SIZE;
+	public static final int MAX_VIEW_DIST = VIEW_SIZE*2;
 	
 	public static final int MAX_SHIP_PARTS = 30;
-
-	public static final float TIME_STEP = 1/300f;
 	
 	public static enum DrawShapeType {POLYGON,CIRCLE,RECT};
 	public static enum ShipPartType {WEAPON,HULL,THRUSTER};
@@ -25,4 +23,6 @@ public class Units {
 
 	public static final int NETWORK_OBJECT_SIZE = 10240;
 	public static final int NETWORK_BUFFER_SIZE = NETWORK_OBJECT_SIZE * 8;
+	public static final float PHYSICS_TIME_STEP = 1/300f;
+	public static final float NETWORK_TIME_STEP = 1/30f;
 }

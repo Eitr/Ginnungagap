@@ -21,10 +21,11 @@ public class PartWeapon extends ShipPart {
 		fireRate = 5;
 		color = new Color(1,0,0,1);
 	}
-		
-	protected void update (boolean isShooting, WorldManager world) {
+	
+	@Override
+	protected void update (Ship ship, WorldManager world) {
 		timeAccumulator += Gdx.graphics.getDeltaTime();
-		while (timeAccumulator >= 1/fireRate && isShooting) {
+		while (timeAccumulator >= 1/fireRate && ship.shooting) {
 			if (health > 0) {
 				createProjectile(world);
 			}

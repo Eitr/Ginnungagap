@@ -11,7 +11,7 @@ import net.eitr.gin.network.ShipData;
 
 public class ShipBuilder {
 
-	float width,height,rotation;
+	float width,height,angle;
 	DrawShapeType shape;
 	ShipPartType buildType;
 	ShipPart newPart;
@@ -23,7 +23,7 @@ public class ShipBuilder {
 		ship = s;
 		width = 4;
 		height = 4;
-		rotation = 0;
+		angle = 0;
 		shape = DrawShapeType.RECT;
 		buildType = ShipPartType.HULL;
 		buildNewPart();
@@ -36,14 +36,14 @@ public class ShipBuilder {
 		switch (shape) {
 		case RECT:
 			switch (buildType){
-			case HULL: newPart = new ShipPart(ship.getNewPartId(), ship.body, ShipPartType.HULL, new Vector2(0,0), width, height, rotation); break;
-			case WEAPON: newPart = new PartWeapon(ship.getNewPartId(), ship.body, new Vector2(0,0), width, height, rotation); break;
-			case THRUSTER: newPart = new PartThruster(ship.getNewPartId(), ship.body, new Vector2(0,0), width, height, rotation); break;
+			case HULL: newPart = new PartHull(ship.getNewPartId(), ship.body, new Vector2(0,0), width, height, angle); break;
+			case WEAPON: newPart = new PartWeapon(ship.getNewPartId(), ship.body, new Vector2(0,0), width, height, angle); break;
+			case THRUSTER: newPart = new PartThruster(ship.getNewPartId(), ship.body, new Vector2(0,0), width, height, angle); break;
 			default: break;
 			}
 			break;
 		case CIRCLE:
-			newPart = new ShipPart(ship.getNewPartId(), ship.body, ShipPartType.HULL, new Vector2(0,0), width/2);
+			newPart = new PartHull(ship.getNewPartId(), ship.body, new Vector2(0,0), width/2);
 			break;
 		default:
 			newPart = null;
@@ -89,17 +89,11 @@ public class ShipBuilder {
 			return;
 		}
 		
-		switch (part.type) {
-		case HULL: break;
-		case THRUSTER: ship.thrust += ((PartThruster)part).thrust; break;
-		case WEAPON: break;
-		default: break;
-		}
 		ship.parts.put(part.getId(), part);
 	}
 
-	void rotate (float angle) {
-		rotation = (angle+360)%360;
+	void rotate (float a) {
+		angle += (a+360)%360;
 	}
 
 	void setMousePosition (Vector2 m) {
@@ -113,8 +107,9 @@ public class ShipBuilder {
 		float x = mouse.x-ship.getX();
 		float y = mouse.y-ship.getY();
 		float dist = (float) Math.sqrt(x*x+y*y);
-		float angle = MathUtils.atan2(y, x);
-		newPart.pos = new Vector2(MathUtils.cos(angle-ship.body.getAngle())*dist,MathUtils.sin(angle-ship.body.getAngle())*dist);
+		float rotation = MathUtils.atan2(y, x);
+		//TODO separate rotation
+		newPart.pos = new Vector2(MathUtils.cos(rotation-ship.body.getAngle())*dist,MathUtils.sin(rotation-ship.body.getAngle())*dist);
 
 		newPart.getGraphics(shipData);
 	}

@@ -11,7 +11,7 @@ import net.eitr.gin.network.ShapeData;
 import net.eitr.gin.network.ShipData;
 import net.eitr.gin.server.WorldManager;
 
-public class ShipPart {
+public abstract class ShipPart {
 
 	protected Body ship;
 	protected DrawShapeType drawType;
@@ -19,8 +19,8 @@ public class ShipPart {
 	protected Vector2 pos;
 	private int id;
 	protected float width,height,angle,radius;
-	protected float health;
-	protected Color color; //TODO individual part color
+	protected float health, armor;
+	protected Color color;
 
 	// RECT shape
 	public ShipPart (int i, Body b, ShipPartType t, Vector2 p, float w, float h, float a) {
@@ -44,10 +44,11 @@ public class ShipPart {
 		type = t;
 		pos = p;
 		health = 100;
-		color = new Color(0,0,1,1);
+		armor = 1;
+		color = new Color(0,1,1,1);
 	}
 	
-	protected void update (boolean isShooting, WorldManager world) {}
+	protected void update (Ship ship, WorldManager world) {}
 	
 	//TODO polygon intersection
 	boolean intersects (ShipPart part) {
@@ -66,8 +67,9 @@ public class ShipPart {
 		return false;
 	}
 	
-	void damage (float damage) {
-		health = MathUtils.clamp(health-damage, 0, 100);
+	void adjustHealth (float amount) {
+		health = MathUtils.clamp(health+(amount>0? amount:amount/armor), 0, 100);
+		System.out.println("health: "+health);
 	}
 	
 	public int getId () {
@@ -78,10 +80,14 @@ public class ShipPart {
 		ShapeData shape = null;
 		switch(drawType) {
 		case CIRCLE: shape = new CircleData(pos.x, pos.y, radius); break;
-		case RECT: shape = new RectData(pos.x-width/2f, pos.y-height/2f, width, height); break;
+		case RECT: shape = new RectData(pos.x-width/2f, pos.y-height/2f, angle, width, height); break;
 		default: return;
 		}
 		shape.setColor(health/100f*color.r, health/100f*color.g, health/100f*color.b, 1);
 		shipData.parts.add(shape);
+	}
+	
+	public float getHealth () {
+		return health;
 	}
 }

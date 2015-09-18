@@ -3,6 +3,7 @@ package net.eitr.gin.server;
 import java.io.IOException;
 
 import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.*;
 import com.esotericsoftware.minlog.Log;
 
@@ -11,6 +12,8 @@ import net.eitr.gin.network.*;
 
 public class ServerMain implements ApplicationListener {
 
+	private float timeAccumulator;
+	
 	private WorldManager world;
 	private PlayerManager players;
 
@@ -25,6 +28,7 @@ public class ServerMain implements ApplicationListener {
 		networkConnection();
 		world = new WorldManager();
 		players = new PlayerManager();
+		timeAccumulator = 0;
 	}
 	
 	/** Setup server socket and data receiver */
@@ -38,7 +42,7 @@ public class ServerMain implements ApplicationListener {
 			// PLAYER INPUT
 			server.addListener(new Listener() {
 				public void connected (Connection connection) {
-					players.createPlayer(connection.getID(), world.createShipBody());
+					players.createPlayer(connection.getID(), world.getNewShipBody());
 				}
 				
 				public void disconnected (Connection connection) {
@@ -64,24 +68,29 @@ public class ServerMain implements ApplicationListener {
 
 	@Override
 	public void render () {
-		GraphicsData data = new GraphicsData();
-		int[] keys = players.getConnectedPlayers();
-		for (int id : keys) {
-			try {
-				if (players.isConnectionReady(id)) {
-					data.reset();
-					data.setPlayerPosition(players.getPlayerPosition(id));
-					players.getGraphics(id,data);
-					world.getGraphics(data);
-					server.sendToTCP(id,data);
-					players.setConnectionReady(id, false);
+		timeAccumulator += Gdx.graphics.getDeltaTime();
+		while (timeAccumulator >= Units.NETWORK_TIME_STEP) {
+			timeAccumulator -= Units.NETWORK_TIME_STEP;
+			GraphicsData data = new GraphicsData();
+			int[] keys = players.getConnectedPlayers();
+			for (int id : keys) {
+				try {
+					if (players.isConnectionReady(id)) {
+						data.reset();
+						data.setPlayerPosition(players.getPlayerPosition(id));
+						players.getGraphics(id,data);
+						world.getGraphics(data);
+						server.sendToTCP(id,data);
+						players.setConnectionReady(id, false);
+					}
+				} catch (NullPointerException e) {
+					Log.error("Null player (probably disconnected)"); //TODO
+					world.destroyBody(players.removePlayer(id));
 				}
-			} catch (NullPointerException e) {
-				Log.error("Null player (probably disconnected)"); //TODO
 			}
 		}
-		players.simulate(world);
-		world.simulate();
+		players.update(world);
+		world.update();
 	}
 
 	@Override

@@ -69,7 +69,8 @@ public class GraphicsManager {
 			
 			for (ShapeData part : ship.parts) {
 				shapes.setColor(part.color);
-				
+
+				shapes.rotate(0, 0, 1, part.angle);
 				if (part instanceof RectData) {
 					shapes.rect(part.x,part.y,((RectData)part).width,((RectData)part).height);
 				} else if (part instanceof CircleData) {
@@ -77,6 +78,7 @@ public class GraphicsManager {
 				} else {
 					System.err.println("Unknown shape: "+part.toString());
 				}
+				shapes.rotate(0, 0, 1, -part.angle);
 			}
 			shapes.rotate(0, 0, 1, -ship.angle);
 			shapes.translate(-ship.x, -ship.y, 0);

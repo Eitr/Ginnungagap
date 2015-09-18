@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
 import net.eitr.gin.Units.ShipPartType;
+import net.eitr.gin.server.WorldManager;
 
 public class PartThruster extends ShipPart {
 
@@ -14,5 +15,12 @@ public class PartThruster extends ShipPart {
 		super(i, b, ShipPartType.THRUSTER, p, w, h, a);
 		thrust = w*h;
 		color = new Color(1,1,0,1);
+	}
+
+	@Override
+	protected void update (Ship ship, WorldManager world) {
+		if (ship.thrusting && health > 0) {
+			ship.thrust(thrust, pos);
+		}
 	}
 }

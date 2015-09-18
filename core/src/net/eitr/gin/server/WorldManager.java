@@ -41,12 +41,18 @@ public class WorldManager {
 						Projectile b = (Projectile)contact.getFixtureB().getBody().getUserData();
 						s.damagePart(p.getId(),b.getDamage());
 						b.remove = true;
+						if (p.getHealth() <= 0) { //TODO sensor isn't working as intended
+							contact.getFixtureA().setSensor(true);
+						}
 					} else {
 						Ship s = (Ship)contact.getFixtureB().getBody().getUserData();
 						ShipPart p = (ShipPart)contact.getFixtureB().getUserData();
 						Projectile b = (Projectile)contact.getFixtureA().getBody().getUserData();
 						s.damagePart(p.getId(),b.getDamage());
 						b.remove = true;
+						if (p.getHealth() <= 0) { //TODO sensor isn't working as intended
+							contact.getFixtureA().setSensor(true);
+						}
 					}
 				}
 			}
@@ -81,14 +87,15 @@ public class WorldManager {
 		
 	}
 
-	void simulate () {
+	void update () {
 		timeAccumulator += Gdx.graphics.getDeltaTime();
 		synchronized (world) {
-			while (timeAccumulator >= Units.TIME_STEP) {
-				world.step(Units.TIME_STEP,6,2);
-				timeAccumulator -= Units.TIME_STEP;
+			while (timeAccumulator >= Units.PHYSICS_TIME_STEP) {
+				timeAccumulator -= Units.PHYSICS_TIME_STEP;
+				world.step(Units.PHYSICS_TIME_STEP,6,2);
 			}
 		}
+		// Update projectiles
 		Iterator<Projectile> ps = projectiles.iterator();
 		while (ps.hasNext()) {
 			Projectile p = ps.next();
@@ -144,7 +151,7 @@ public class WorldManager {
 		edgeShape.dispose();
 	}
 
-	Body createShipBody () {
+	Body getNewShipBody () {
 		BodyDef shipDef = new BodyDef();
 		shipDef.type = BodyType.DynamicBody;
 		shipDef.position.set(0,0);

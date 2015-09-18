@@ -61,7 +61,7 @@ public class Projectile extends WorldBody {
 		if (Vector2.dst(g.x, g.y, body.getPosition().x, body.getPosition().y) > Units.MAX_VIEW_DIST) { 
 			return;
 		}
-		RectData rect = new RectData(body.getPosition().x-size/2, body.getPosition().y-size/2, size, size);
+		RectData rect = new RectData(body.getPosition().x-size/2, body.getPosition().y-size/2, body.getAngle(), size, size);
 		rect.setColor(1f, 0f, 1f, 1f);
 		g.shapes.add(rect);
 	}

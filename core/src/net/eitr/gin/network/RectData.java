@@ -5,8 +5,8 @@ public class RectData extends ShapeData {
 	
 	public RectData () {}
 	
-	public RectData (float px, float py, float w, float h) {
-		super(px,py);
+	public RectData (float px, float py, float a, float w, float h) {
+		super(px,py,a);
 		width = w;
 		height = h;
 	}
